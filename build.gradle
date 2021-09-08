@@ -2,9 +2,8 @@ plugins {
     id 'org.springframework.boot' version '2.5.4'
     id 'io.spring.dependency-management' version '1.0.11.RELEASE'
     id 'java'
+    id 'scala'
 }
-
-apply plugin: 'scala'
 
 group = 'com.example'
 version = '0.0.1-SNAPSHOT'
@@ -21,6 +20,7 @@ repositories {
 }
 
 dependencies {
+    implementation 'dev.zio:zio_3:1.0.11'
     implementation 'org.scala-lang:scala3-library_3:3.0.2'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
