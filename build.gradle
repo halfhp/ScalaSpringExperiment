@@ -1,7 +1,6 @@
 plugins {
     id 'org.springframework.boot' version '2.5.4'
     id 'io.spring.dependency-management' version '1.0.11.RELEASE'
-    id 'java'
     id 'scala'
 }
 
@@ -20,14 +19,31 @@ repositories {
 }
 
 dependencies {
-    implementation 'dev.zio:zio_3:1.0.11'
+    implementation 'dev.zio:zio_3:1.0.12'
+    implementation 'dev.zio:zio-config_3:1.0.10'
     implementation 'org.scala-lang:scala3-library_3:3.0.2'
-    implementation 'org.springframework.boot:spring-boot-starter-web'
-    developmentOnly 'org.springframework.boot:spring-boot-devtools'
-    annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    implementation 'org.springframework.boot:spring-boot-starter-web:2.5.5'
+    developmentOnly 'org.springframework.boot:spring-boot-devtools:2.5.5'
+    annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor:2.5.5'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test:2.5.5'
+    testImplementation 'org.scalatest:scalatest_3:3.2.10'
+//    testImplementation 'org.mockito:mockito-scala-scalatest_2.13:1.16.46'
+    testImplementation 'org.scalatestplus:mockito-3-12_3:3.2.10.0'
+
+    // TODO: remove this. see: https://github.com/scalatest/scalatest/issues/1454
+    testImplementation 'co.helmethair:scalatest-junit-runner:0.1.10'
+    testImplementation 'dev.zio:zio-test_3:1.0.12'
 }
 
 test {
-    useJUnitPlatform()
+    useJUnitPlatform {
+        includeEngines 'scalatest'
+        testLogging {
+            events("passed", "skipped", "failed")
+        }
+    }
 }
+
+//test {
+//    useJUnitPlatform()
+//}
