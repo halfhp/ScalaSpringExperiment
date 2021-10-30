@@ -4,9 +4,11 @@ import com.fasterxml.jackson.databind.node.ObjectNode
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.access.annotation.Secured
 import org.springframework.security.access.prepost.PreAuthorize
-import org.springframework.web.bind.annotation.{GetMapping, RequestMapping, RequestMethod, RestController}
-import zio.Runtime
-import zio.{IO, Task, ZIO}
+import org.springframework.web.bind.annotation.{GetMapping, PostMapping, RequestBody, RequestMapping, RequestMethod, RestController}
+//import zio.Runtime
+//import zio.{IO, Task, ZIO}
+import cats.effect.{IO}
+import cats.effect.unsafe.implicits.global
 import io.circe.*
 import io.circe.parser.*
 import io.circe.syntax.*
@@ -22,8 +24,9 @@ class SimpleController(
   simpleService: SimpleService
 ) {
 
-  implicit def zToA[E, A](zio: ZIO[Any, E, A]): A = {
-    Runtime.default.unsafeRun(zio)
+  implicit def ioToA[A](io: IO[A]): A = {
+    io.unsafeRunSync()
+    //Runtime.default.unsafeRun(zio)
   }
 
   //@PreAuthorize("true")
@@ -35,13 +38,23 @@ class SimpleController(
     } yield (s"$something then $somethingElse")
   }
 
-  @PermitAll
   @PreAuthorize("permitAll()")
-  @RequestMapping(path = Array("/foo"), method = Array(RequestMethod.GET))
-  def getFoo(): String = {
+  @GetMapping(path = Array("/foo"))
+  def getFoo(): Json = {
     for {
-      foo <- simpleService.getFoo()
-    } yield (foo.asJson.noSpaces)
+      maybeFoo <- simpleService.getFoo()
+      result <- IO.pure(maybeFoo.fold(
+        left => { left.asJson },
+        right => { right.asJson }
+      ))
+    } yield (result)
   }
 
+  @PreAuthorize("permitAll()")
+  @PostMapping(path = Array("/bar"))
+  def postBar(
+    @RequestBody requestBody: Json
+  ): Json = {
+    requestBody
+  }
 }

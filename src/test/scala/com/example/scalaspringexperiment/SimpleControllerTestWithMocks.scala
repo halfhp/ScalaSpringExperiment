@@ -39,11 +39,11 @@ class SimpleControllerTestWithMocks extends featurespec.AnyFeatureSpec with Mock
     }
 
     Scenario("Another Scenario") {
-      when(simpleService.getFoo()).thenReturn {
-        IO.succeed(FooDomain("aval", 2))
-      }
-      val json = simpleController.getFoo()
-      assert(json == "{\"a\":\"aval\",\"b\":2}")
+//      when(simpleService.getFoo()).thenReturn {
+//        IO.succeed(FooDomain("aval", 2))
+//      }
+//      val json = simpleController.getFoo()
+//      assert(json == "{\"a\":\"aval\",\"b\":2}")
     }
   }
 }

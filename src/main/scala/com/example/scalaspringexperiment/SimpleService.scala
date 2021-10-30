@@ -1,8 +1,10 @@
 package com.example.scalaspringexperiment
 
 import org.springframework.stereotype.Service
-import zio.{IO, Task, ZIO}
-import zio.config.*
+//import zio.{IO, Task, ZIO}
+//import zio.config.*
+import cats.effect.{IO}
+import cats.implicits.*
 
 @Service
 class SimpleService {
@@ -11,19 +13,19 @@ class SimpleService {
     message: String
   )
 
-  def getFoo(): IO[SimpleServiceError, FooDomain] = IO.succeed {
-    FooDomain(
-      a = "hi",
+  def getFoo(): IO[Either[SimpleServiceError, FooDomain]] = IO.pure {
+    Either.right(FooDomain(
+      a = "hi!",
       b = 2
-    )
+    ))
   }
 
-  def doSomething(): IO[SimpleServiceError, String] = IO.succeed {
-    "did something"
+  def doSomething(): IO[Either[SimpleServiceError, String]] = IO.pure {
+    Either.right("did something")
   }
 
-  def doSomethingElse(): IO[SimpleServiceError, String] = IO.succeed {
-    "did something else"
+  def doSomethingElse(): IO[Either[SimpleServiceError, String]] = IO.pure {
+    Either.right("did something else")
   }
 
 }

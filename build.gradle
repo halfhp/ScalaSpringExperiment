@@ -19,8 +19,9 @@ repositories {
 }
 
 dependencies {
-    implementation 'dev.zio:zio_3:1.0.12'
-    implementation 'dev.zio:zio-config_3:1.0.10'
+//    implementation 'dev.zio:zio_3:1.0.12'
+//    implementation 'dev.zio:zio-config_3:1.0.10'
+    implementation 'org.typelevel:cats-effect_3:3.2.9'
     implementation 'org.scala-lang:scala3-library_3:3.0.2'
     implementation 'org.springframework.boot:spring-boot-starter-web:2.5.5'
     implementation 'org.springframework.boot:spring-boot-starter-security:2.5.5'
