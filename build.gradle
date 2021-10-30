@@ -23,11 +23,17 @@ dependencies {
     implementation 'dev.zio:zio-config_3:1.0.10'
     implementation 'org.scala-lang:scala3-library_3:3.0.2'
     implementation 'org.springframework.boot:spring-boot-starter-web:2.5.5'
+    implementation 'org.springframework.boot:spring-boot-starter-security:2.5.5'
+    implementation 'org.springframework.security:spring-security-test:5.5.1'
+    implementation 'io.circe:circe-core_3:0.14.1'
+    implementation 'io.circe:circe-generic_3:0.14.1'
+    implementation 'io.circe:circe-parser_3:0.14.1'
+
     developmentOnly 'org.springframework.boot:spring-boot-devtools:2.5.5'
     annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor:2.5.5'
+
     testImplementation 'org.springframework.boot:spring-boot-starter-test:2.5.5'
     testImplementation 'org.scalatest:scalatest_3:3.2.10'
-//    testImplementation 'org.mockito:mockito-scala-scalatest_2.13:1.16.46'
     testImplementation 'org.scalatestplus:mockito-3-12_3:3.2.10.0'
 
     // TODO: remove this. see: https://github.com/scalatest/scalatest/issues/1454

@@ -13,7 +13,7 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.TestContextManager
 import zio.{Task, ZIO, IO}
 
-class SimpleControllerTest2 extends featurespec.AnyFeatureSpec with MockitoSugar {
+class SimpleControllerTestWithMocks extends featurespec.AnyFeatureSpec with MockitoSugar {
 
   @InjectMocks
   val simpleController: SimpleController = null
@@ -36,6 +36,14 @@ class SimpleControllerTest2 extends featurespec.AnyFeatureSpec with MockitoSugar
       }
 
       assert(simpleController.test() == "first then second")
+    }
+
+    Scenario("Another Scenario") {
+      when(simpleService.getFoo()).thenReturn {
+        IO.succeed(FooDomain("aval", 2))
+      }
+      val json = simpleController.getFoo()
+      assert(json == "{\"a\":\"aval\",\"b\":2}")
     }
   }
 }
