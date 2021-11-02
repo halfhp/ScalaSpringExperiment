@@ -5,8 +5,6 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.access.annotation.Secured
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.{GetMapping, PostMapping, RequestBody, RequestMapping, RequestMethod, RestController}
-//import zio.Runtime
-//import zio.{IO, Task, ZIO}
 import cats.effect.{IO}
 import cats.effect.unsafe.implicits.global
 import io.circe.*
@@ -21,16 +19,16 @@ import scala.language.implicitConversions
 @RestController
 @Autowired
 class SimpleController(
-  simpleService: SimpleService
+  simpleService: SimpleService,
+  fooService: FooService
 ) {
 
   implicit def ioToA[A](io: IO[A]): A = {
     io.unsafeRunSync()
-    //Runtime.default.unsafeRun(zio)
   }
 
-  //@PreAuthorize("true")
-  @RequestMapping(path = Array("/scala"), method = Array(RequestMethod.GET))
+  @PreAuthorize("permitAll()")
+  @GetMapping(path = Array("/scala"))
   def test(): String = {
     for {
       something <- simpleService.doSomething()
@@ -42,11 +40,8 @@ class SimpleController(
   @GetMapping(path = Array("/foo"))
   def getFoo(): Json = {
     for {
-      maybeFoo <- simpleService.getFoo()
-      result <- IO.pure(maybeFoo.fold(
-        left => { left.asJson },
-        right => { right.asJson }
-      ))
+      maybeFoo <- fooService.insert(FooDomain(a = "new", b = 134))
+      result <- IO.pure(maybeFoo.fold(FooDomain(a = "oops", b = 999).asJson){ f => f.asJson })
     } yield (result)
   }
 
