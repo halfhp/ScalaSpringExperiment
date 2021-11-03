@@ -6,7 +6,8 @@ import cats.effect.IO
 import cats.implicits.*
 import doobie.*
 import doobie.implicits.*
-import doobie.implicits.javatime._
+import doobie.implicits.javatime.*
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 
 @Service
@@ -15,7 +16,12 @@ class FooService(
   override val persistence: Persistence
 ) extends PersistenceLayer[FooDomain] {
 
+  override val logger = LoggerFactory.getLogger(classOf[FooService])
+
   override val tableName = "foo"
+  override val insertRows = "a, b"
+
+  override def insertValues(model: FooDomain) = fr"${model.a}, ${model.b}"
 
   case class FooServiceError(
     message: String
@@ -27,18 +33,4 @@ class FooService(
       b = 2
     ))
   }
-
-  def insert(model: FooDomain): cats.effect.IO[Option[FooDomain]] = {
-    val q =
-      sql"""
-INSERT INTO foo (a, b)
-VALUES (${model.a}, ${model.b})
-"""
-    for {
-      id <- q.update.run.transact(persistence.xa)
-      f <- findById(id)
-    } yield f
-  }
-
-  def update(model: FooDomain): cats.effect.IO[Option[FooDomain]] = ???
 }

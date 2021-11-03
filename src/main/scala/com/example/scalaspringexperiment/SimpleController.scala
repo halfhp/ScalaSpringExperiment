@@ -11,6 +11,9 @@ import io.circe.*
 import io.circe.parser.*
 import io.circe.syntax.*
 import io.circe.generic.auto.*
+import doobie.*
+import doobie.implicits.*
+import doobie.implicits.javatime.*
 
 import javax.annotation.security.PermitAll
 import scala.language.implicitConversions
