@@ -27,12 +27,15 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-security:2.5.6'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa:2.5.6'
     implementation 'org.springframework.security:spring-security-test:5.5.1'
+
     implementation 'io.circe:circe-core_3:0.14.1'
     implementation 'io.circe:circe-generic_3:0.14.1'
     implementation 'io.circe:circe-parser_3:0.14.1'
 
     implementation 'org.tpolecat:doobie-core_3:1.0.0-RC1'
     implementation 'org.tpolecat:doobie-postgres_3:1.0.0-RC1'
+
+    implementation 'org.flywaydb:flyway-core:8.0.3'
 
     developmentOnly 'org.springframework.boot:spring-boot-devtools:2.5.5'
     annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor:2.5.6'

@@ -43,8 +43,9 @@ class SimpleController(
   @GetMapping(path = Array("/foo"))
   def getFoo(): Json = {
     for {
-      maybeFoo <- fooService.insert(FooDomain(a = "new", b = 134))
-      result <- IO.pure(maybeFoo.fold(FooDomain(a = "oops", b = 999).asJson){ f => f.asJson })
+      fooList <- fooService.insert2(FooDomain(a = "new", b = 134))
+      //result <- IO.pure(maybeFoo.fold(FooDomain(a = "oops", b = 999).asJson){ f => f.asJson })
+      result <- IO.pure(fooList.asJson)
     } yield (result)
   }
 

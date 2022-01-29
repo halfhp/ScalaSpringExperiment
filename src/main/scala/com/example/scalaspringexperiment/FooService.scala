@@ -6,7 +6,8 @@ import cats.effect.IO
 import cats.implicits.*
 import doobie.*
 import doobie.implicits.*
-import doobie.implicits.javatime.*
+//import doobie.implicits.javatime.*
+import doobie.postgres.implicits.*
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 
@@ -19,9 +20,20 @@ class FooService(
   override val logger = LoggerFactory.getLogger(classOf[FooService])
 
   override val tableName = "foo"
-  override val insertRows = "a, b"
+  override val insertRows = "id, dateCreated, lastUpdated, a, b,"
 
-  override def insertValues(model: FooDomain) = fr"${model.a}, ${model.b}"
+  override def insertValues(model: FooDomain) = fr"${model.id}, ${model.dateCreated}, ${model.lastUpdated}, ${model.a}, ${model.b}"
+
+  def insert2(model: FooDomain): IO[List[FooDomain]] = {
+    val sql = "insert into foo (datecreated, lastupdated, a, b) values (?, ?, ?, ?)"
+    Update[FooDomain](sql)
+      //.updateMany(List(model))
+      .updateManyWithGeneratedKeys[FooDomain]("id", "datecreated", "lastupdated", "a", "b")(List(model))
+      //.update.withGeneratedKeys[FooDomain]("id")(model)
+      .compile
+      .toList
+      .transact(persistence.xa)
+  }
 
   case class FooServiceError(
     message: String
