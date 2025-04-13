@@ -28,7 +28,8 @@ trait PersistenceLayer[T <: DomainModel] {
   val tableName: String
   val insertRows: String
 
-  implicit val logHandler: LogHandler = LogHandler((evt) => logger.info(evt.toString))
+  // TODO - figure out how to get this working again
+  // implicit val logHandler: LogHandler = LogHandler(evt => logger.info(evt.toString))
 
   def insertValues(model: T): Fragment
 

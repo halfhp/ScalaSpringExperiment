@@ -1,12 +1,12 @@
 plugins {
-    id 'org.springframework.boot' version '2.5.4'
-    id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+    id 'org.springframework.boot' version '3.4.4'
+    id 'io.spring.dependency-management' version '1.1.7'
     id 'scala'
 }
 
 group = 'com.example'
 version = '0.0.1-SNAPSHOT'
-sourceCompatibility = '11'
+//sourceCompatibility = '11'
 
 configurations {
     compileOnly {
@@ -19,34 +19,32 @@ repositories {
 }
 
 dependencies {
-//    implementation 'dev.zio:zio_3:1.0.12'
-//    implementation 'dev.zio:zio-config_3:1.0.10'
-    implementation 'org.typelevel:cats-effect_3:3.2.9'
-    implementation 'org.scala-lang:scala3-library_3:3.1.0'
-    implementation 'org.springframework.boot:spring-boot-starter-web:2.5.6'
-    implementation 'org.springframework.boot:spring-boot-starter-security:2.5.6'
-    implementation 'org.springframework.boot:spring-boot-starter-data-jpa:2.5.6'
-    implementation 'org.springframework.security:spring-security-test:5.5.1'
+    implementation 'org.scala-lang:scala3-library_3:3.6.4'
+    implementation 'org.typelevel:cats-effect_3:3.6.1'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.security:spring-security-test'
 
     implementation 'io.circe:circe-core_3:0.14.1'
     implementation 'io.circe:circe-generic_3:0.14.1'
     implementation 'io.circe:circe-parser_3:0.14.1'
 
-    implementation 'org.tpolecat:doobie-core_3:1.0.0-RC1'
-    implementation 'org.tpolecat:doobie-postgres_3:1.0.0-RC1'
+    implementation 'org.tpolecat:doobie-core_3:1.0.0-RC8'
+    implementation 'org.tpolecat:doobie-postgres_3:1.0.0-RC8'
 
-    implementation 'org.flywaydb:flyway-core:8.0.3'
+    implementation 'org.flywaydb:flyway-core:11.4.0'
 
-    developmentOnly 'org.springframework.boot:spring-boot-devtools:2.5.5'
-    annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor:2.5.6'
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'
 
-    testImplementation 'org.springframework.boot:spring-boot-starter-test:2.5.6'
+    annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
+
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.scalatest:scalatest_3:3.2.10'
     testImplementation 'org.scalatestplus:mockito-3-12_3:3.2.10.0'
 
     // TODO: remove this. see: https://github.com/scalatest/scalatest/issues/1454
     testImplementation 'co.helmethair:scalatest-junit-runner:0.1.10'
-    testImplementation 'dev.zio:zio-test_3:1.0.12'
     testImplementation 'org.tpolecat:doobie-scalatest_3:1.0.0-RC1'
 }
 

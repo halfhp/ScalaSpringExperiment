@@ -25,10 +25,10 @@ class FooService(
   override def insertValues(model: FooDomain) = fr"${model.id}, ${model.dateCreated}, ${model.lastUpdated}, ${model.a}, ${model.b}"
 
   def insert2(model: FooDomain): IO[List[FooDomain]] = {
-    val sql = "insert into foo (datecreated, lastupdated, a, b) values (?, ?, ?, ?)"
+    val sql = "insert into foo (dateCreated, lastUpdated, a, b) values (?, ?, ?, ?)"
     Update[FooDomain](sql)
       //.updateMany(List(model))
-      .updateManyWithGeneratedKeys[FooDomain]("id", "datecreated", "lastupdated", "a", "b")(List(model))
+      .updateManyWithGeneratedKeys[FooDomain]("id", "dateCreated", "lastUpdated", "a", "b")(List(model))
       //.update.withGeneratedKeys[FooDomain]("id")(model)
       .compile
       .toList

@@ -1,11 +1,12 @@
 package com.example.scalaspringexperiment
+import cats.data.EitherT
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.node.ObjectNode
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.access.annotation.Secured
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.{GetMapping, PostMapping, RequestBody, RequestMapping, RequestMethod, RestController}
-import cats.effect.{IO}
+import cats.effect.IO
 import cats.effect.unsafe.implicits.global
 import io.circe.*
 import io.circe.parser.*
@@ -13,9 +14,9 @@ import io.circe.syntax.*
 import io.circe.generic.auto.*
 import doobie.*
 import doobie.implicits.*
-import doobie.implicits.javatime.*
+//import doobie.implicits.javatime.*
 
-import javax.annotation.security.PermitAll
+//import javax.annotation.security.PermitAll
 import scala.language.implicitConversions
 
 @PreAuthorize("true")
@@ -33,10 +34,12 @@ class SimpleController(
   @PreAuthorize("permitAll()")
   @GetMapping(path = Array("/scala"))
   def test(): String = {
-    for {
-      something <- simpleService.doSomething()
-      somethingElse <- simpleService.doSomethingElse()
-    } yield (s"$something then $somethingElse")
+    (for {
+      something <- EitherT(simpleService.doSomething())
+      somethingElse <- EitherT(simpleService.doSomethingElse())
+    } yield s"$something then $somethingElse")
+      .value
+      .map(_.getOrElse("error"))
   }
 
   @PreAuthorize("permitAll()")
@@ -46,7 +49,7 @@ class SimpleController(
       fooList <- fooService.insert2(FooDomain(a = "new", b = 134))
       //result <- IO.pure(maybeFoo.fold(FooDomain(a = "oops", b = 999).asJson){ f => f.asJson })
       result <- IO.pure(fooList.asJson)
-    } yield (result)
+    } yield result
   }
 
   @PreAuthorize("permitAll()")

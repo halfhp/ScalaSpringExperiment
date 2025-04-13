@@ -11,7 +11,7 @@ import org.scalatestplus.mockito.MockitoSugar
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.TestContextManager
-import zio.{Task, ZIO, IO}
+import cats.effect.IO
 
 class SimpleControllerTestWithMocks extends featurespec.AnyFeatureSpec with MockitoSugar {
 
@@ -28,11 +28,13 @@ class SimpleControllerTestWithMocks extends featurespec.AnyFeatureSpec with Mock
     Scenario("A Scenario") {
 
       when(simpleService.doSomething()).thenReturn {
-        IO.succeed("first")
+        IO.pure(Right("first"))
+//        IO.succeed("first")
       }
 
       when(simpleService.doSomethingElse()).thenReturn {
-        IO.succeed("second")
+        IO.pure(Right("second"))
+        //IO.succeed("second")
       }
 
       assert(simpleController.test() == "first then second")

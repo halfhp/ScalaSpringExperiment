@@ -1,9 +1,7 @@
 package com.example.scalaspringexperiment
 
 import org.springframework.stereotype.Service
-//import zio.{IO, Task, ZIO}
-//import zio.config.*
-import cats.effect.{IO}
+import cats.effect.IO
 import cats.implicits.*
 
 @Service
