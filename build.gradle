@@ -6,7 +6,6 @@ plugins {
 
 group = 'com.example'
 version = '0.0.1-SNAPSHOT'
-//sourceCompatibility = '11'
 
 configurations {
     compileOnly {
@@ -26,12 +25,12 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.security:spring-security-test'
 
-    implementation 'io.circe:circe-core_3:0.14.1'
-    implementation 'io.circe:circe-generic_3:0.14.1'
-    implementation 'io.circe:circe-parser_3:0.14.1'
+    implementation 'io.circe:circe-core_3:0.14.12'
+    implementation 'io.circe:circe-generic_3:0.14.12'
+    implementation 'io.circe:circe-parser_3:0.14.12'
 
-    implementation 'org.tpolecat:doobie-core_3:1.0.0-RC8'
-    implementation 'org.tpolecat:doobie-postgres_3:1.0.0-RC8'
+    implementation 'org.tpolecat:doobie-core_3:1.0.0-RC9'
+    implementation 'org.tpolecat:doobie-postgres_3:1.0.0-RC9'
 
     implementation 'org.flywaydb:flyway-core:11.4.0'
 
@@ -40,12 +39,12 @@ dependencies {
     annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    testImplementation 'org.scalatest:scalatest_3:3.2.10'
-    testImplementation 'org.scalatestplus:mockito-3-12_3:3.2.10.0'
+    testImplementation 'org.scalatest:scalatest_3:3.2.19'
+    testImplementation 'org.scalatestplus:mockito-5-12_3:3.2.19.0'
 
     // TODO: remove this. see: https://github.com/scalatest/scalatest/issues/1454
     testImplementation 'co.helmethair:scalatest-junit-runner:0.1.10'
-    testImplementation 'org.tpolecat:doobie-scalatest_3:1.0.0-RC1'
+    testImplementation 'org.tpolecat:doobie-scalatest_3:1.0.0-RC9'
 }
 
 test {
