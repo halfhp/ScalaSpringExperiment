@@ -4,6 +4,7 @@ import doobie.free.connection.ConnectionIO
 import org.springframework.stereotype.Service
 import cats.effect.IO
 import cats.implicits.*
+import com.example.scalaspringexperiment.model.FooDomain
 import doobie.*
 import doobie.implicits.*
 //import doobie.implicits.javatime.*
@@ -24,7 +25,7 @@ class FooService(
 
   override def insertValues(model: FooDomain) = fr"${model.id}, ${model.dateCreated}, ${model.lastUpdated}, ${model.a}, ${model.b}"
 
-  def insert2(model: FooDomain): IO[List[FooDomain]] = {
+  def insert2(model: FooDomain): IO[List[FooDomain]] = persistence.ds.use { xa =>
     val sql = "insert into foo (dateCreated, lastUpdated, a, b) values (?, ?, ?, ?)"
     Update[FooDomain](sql)
       //.updateMany(List(model))
@@ -32,7 +33,7 @@ class FooService(
       //.update.withGeneratedKeys[FooDomain]("id")(model)
       .compile
       .toList
-      .transact(persistence.xa)
+      .transact(xa)
   }
 
   case class FooServiceError(

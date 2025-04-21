@@ -3,6 +3,7 @@ package com.example.scalaspringexperiment
 import org.springframework.stereotype.Service
 import cats.effect.IO
 import cats.implicits.*
+import com.example.scalaspringexperiment.model.FooDomain
 
 @Service
 class SimpleService {

@@ -1,13 +1,14 @@
 package com.example.scalaspringexperiment
 import cats.data.EitherT
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.databind.node.ObjectNode
+//import com.fasterxml.jackson.databind.ObjectMapper
+//import com.fasterxml.jackson.databind.node.ObjectNode
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.access.annotation.Secured
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.{GetMapping, PostMapping, RequestBody, RequestMapping, RequestMethod, RestController}
 import cats.effect.IO
 import cats.effect.unsafe.implicits.global
+import com.example.scalaspringexperiment.model.FooDomain
 import io.circe.*
 import io.circe.parser.*
 import io.circe.syntax.*

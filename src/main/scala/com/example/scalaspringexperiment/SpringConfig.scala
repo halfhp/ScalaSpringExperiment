@@ -1,19 +1,19 @@
 package com.example.scalaspringexperiment
 
+import cats.effect.{IO, Resource}
+import com.example.scalaspringexperiment.util.CirceHttpMessageConverter
+import doobie.{DataSourceTransactor, ExecutionContexts}
+import doobie.util.transactor.Transactor
 import org.springframework.boot.autoconfigure.http.HttpMessageConverters
 import org.springframework.boot.jdbc.DataSourceBuilder
 import org.springframework.context.annotation.{Bean, Configuration, Lazy}
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity
-import org.springframework.security.config.annotation.web.builders.HttpSecurity
-//import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter
-import org.springframework.security.config.http.SessionCreationPolicy
-import org.springframework.security.web.SecurityFilterChain
-import org.springframework.security.web.authentication.www.BasicAuthenticationFilter
 
 import javax.sql.DataSource
 
 @Configuration
-class MyConfig {
+class SpringConfig(
+  dataSource: DataSource,
+) {
 
   @Bean
   def customConverters(): HttpMessageConverters = {
@@ -22,14 +22,21 @@ class MyConfig {
   }
 
   @Bean
-  def getDataSource(): DataSource = {
-    DataSourceBuilder.create()
-      .driverClassName("org.postgresql.Driver")
-      .url("jdbc:postgresql://localhost:5432/springtest")
-      .username("postgres")
-      .password("ou812")
-      .build()
+  def getDoobieTransactor(): Resource[IO, DataSourceTransactor[IO]] = {
+    for {
+      ce <- ExecutionContexts.fixedThreadPool[IO](32) // our connect EC
+    } yield Transactor.fromDataSource[IO](dataSource, ce)
   }
+
+//  @Bean
+//  def dataSource(): DataSource = {
+//    DataSourceBuilder.create()
+//      .driverClassName("org.postgresql.Driver")
+//      .url("jdbc:postgresql://localhost:5432/springtest")
+//      .username("postgres")
+//      .password("ou812")
+//      .build()
+//  }
 }
 
 // TODO: fixme
