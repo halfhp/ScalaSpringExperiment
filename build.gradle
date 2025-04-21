@@ -59,19 +59,19 @@ dependencies {
     testImplementation 'org.scalatestplus:mockito-5-12_3:3.2.19.0'
 
     // TODO: remove this. see: https://github.com/scalatest/scalatest/issues/1454
-    testImplementation 'co.helmethair:scalatest-junit-runner:0.1.10'
-    testImplementation 'org.tpolecat:doobie-scalatest_3:1.0.0-RC9'
+    testImplementation 'co.helmethair:scalatest-junit-runner:0.2.0'
+//    testImplementation 'org.tpolecat:doobie-scalatest_3:1.0.0-RC9'
 }
 
-test {
-    useJUnitPlatform {
-        includeEngines 'scalatest'
-        testLogging {
-            events("passed", "skipped", "failed")
-        }
-    }
+// TODO: remove with helmethair/scalatest-junit-runner dependency
+tasks.named('test') {
+    useJUnitPlatform()
 }
-
 //test {
-//    useJUnitPlatform()
+//    useJUnitPlatform {
+//        includeEngines 'scalatest'
+//        testLogging {
+//            events("passed", "skipped", "failed")
+//        }
+//    }
 //}

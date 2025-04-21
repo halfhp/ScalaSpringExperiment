@@ -1,5 +1,6 @@
 package com.example.scalaspringexperiment
 
+import com.example.scalaspringexperiment.test.MyTestConfig
 import org.apache.tomcat.util.bcel.classfile.JavaClass
 import org.junit.jupiter.api.Test
 import org.springframework.boot.test.context.SpringBootTest
@@ -9,26 +10,25 @@ import org.mockito.Mock
 import org.scalatest.*
 import org.scalatestplus.mockito.MockitoSugar
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.context.annotation.Import
 import org.springframework.test.context.TestContextManager
 
-@SpringBootTest
-class SimpleControllerTest extends featurespec.AnyFeatureSpec with MockitoSugar {
+import scala.compiletime.uninitialized
+
+@SpringBootTest()
+@Import(Array(classOf[MyTestConfig]))
+class SimpleControllerTest extends MockitoSugar {
 
   @Autowired
-  val simpleController: SimpleController = null
+  var simpleController: SimpleController = uninitialized
 
   @Autowired
-  val simpleService: SimpleService = null
+  var simpleService: SimpleService = uninitialized
 
-  // TODO - figure out how to get rid of this
-  new TestContextManager(this.getClass()).prepareTestInstance(this)
-
-  Feature("A Feature") {
-    Scenario("A Scenario") {
-      val w = simpleController.test()
-      assert(true)
-    }
+  @Test
+  def testSomething(): Unit = {
+    val result = simpleController.test()
+    assert(result == "did something then did something else")
   }
-
 }
 
