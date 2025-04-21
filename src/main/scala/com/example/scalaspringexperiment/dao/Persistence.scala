@@ -1,13 +1,15 @@
-package com.example.scalaspringexperiment
+package com.example.scalaspringexperiment.dao
 
-import doobie.*
-import doobie.implicits.*
 import cats.*
 import cats.effect.*
+import com.example.scalaspringexperiment.dao.Persistence
 import com.example.scalaspringexperiment.model.DomainModel
+import doobie.*
+import doobie.implicits.*
 import org.slf4j.Logger
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
+
 import scala.compiletime.uninitialized
 
 @Service

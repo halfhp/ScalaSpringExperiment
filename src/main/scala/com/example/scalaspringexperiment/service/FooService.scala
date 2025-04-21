@@ -1,12 +1,13 @@
-package com.example.scalaspringexperiment
+package com.example.scalaspringexperiment.service
 
-import doobie.free.connection.ConnectionIO
-import org.springframework.stereotype.Service
 import cats.effect.IO
 import cats.implicits.*
 import com.example.scalaspringexperiment.model.FooDomain
+import com.example.scalaspringexperiment.dao.{Persistence, PersistenceLayer}
 import doobie.*
+import doobie.free.connection.ConnectionIO
 import doobie.implicits.*
+import org.springframework.stereotype.Service
 //import doobie.implicits.javatime.*
 import doobie.postgres.implicits.*
 import org.slf4j.LoggerFactory

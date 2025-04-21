@@ -1,23 +1,18 @@
-package com.example.scalaspringexperiment
+package com.example.scalaspringexperiment.controller
+
 import cats.data.EitherT
-//import com.fasterxml.jackson.databind.ObjectMapper
-//import com.fasterxml.jackson.databind.node.ObjectNode
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.security.access.annotation.Secured
-import org.springframework.security.access.prepost.PreAuthorize
-import org.springframework.web.bind.annotation.{GetMapping, PostMapping, RequestBody, RequestMapping, RequestMethod, RestController}
+import com.example.scalaspringexperiment.service.{FooService, SimpleService}
 import cats.effect.IO
 import cats.effect.unsafe.implicits.global
 import com.example.scalaspringexperiment.model.FooDomain
-import io.circe.*
-import io.circe.parser.*
-import io.circe.syntax.*
-import io.circe.generic.auto.*
-import doobie.*
 import doobie.implicits.*
-//import doobie.implicits.javatime.*
+import io.circe.*
+import io.circe.generic.auto.*
+import io.circe.syntax.*
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.security.access.prepost.PreAuthorize
+import org.springframework.web.bind.annotation.*
 
-//import javax.annotation.security.PermitAll
 import scala.language.implicitConversions
 
 @PreAuthorize("true")
