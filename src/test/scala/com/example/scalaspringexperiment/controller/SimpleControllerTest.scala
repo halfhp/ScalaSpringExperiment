@@ -2,6 +2,7 @@ package com.example.scalaspringexperiment.controller
 
 import com.example.scalaspringexperiment.service.SimpleService
 import com.example.scalaspringexperiment.test.{SpringTestConfig, TestUtils}
+import io.circe.parser.*
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.{BeforeEach, Test}
 import org.springframework.boot.test.context.SpringBootTest
@@ -37,7 +38,16 @@ class SimpleControllerTest {
   @Test
   def testGetFoo(): Unit = {
     val result = simpleController.getFoo()
-    assertEquals("foo", result)
+    assertEquals(parse(
+      """
+        |{
+        |  "id" : 38,
+        |  "dateCreated" : 0,
+        |  "lastUpdated" : 0,
+        |  "a" : "new",
+        |  "b" : 134
+        |}
+        |""".stripMargin), result)
   }
 }
 
