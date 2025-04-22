@@ -1,7 +1,7 @@
 CREATE table foo (
     id SERIAL PRIMARY KEY,
-    dateCreated timestamp,
-    lastUpdated timestamp,
+    date_created timestamp,
+    last_updated timestamp,
     a varchar,
     b int
 );

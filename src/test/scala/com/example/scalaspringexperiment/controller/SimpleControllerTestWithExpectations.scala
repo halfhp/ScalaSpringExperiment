@@ -2,7 +2,7 @@ package com.example.scalaspringexperiment.controller
 
 import com.example.scalaspringexperiment.controller.SimpleController
 import com.example.scalaspringexperiment.service.SimpleService
-import com.example.scalaspringexperiment.test.MyTestConfig
+import com.example.scalaspringexperiment.test.SpringTestConfig
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito.{times, verify}
 import org.springframework.beans.factory.annotation.Autowired
@@ -13,7 +13,7 @@ import org.springframework.test.context.bean.`override`.mockito.MockitoSpyBean
 import scala.compiletime.uninitialized
 
 @SpringBootTest()
-@Import(Array(classOf[MyTestConfig]))
+@Import(Array(classOf[SpringTestConfig]))
 class SimpleControllerTestWithExpectations {
 
   @Autowired

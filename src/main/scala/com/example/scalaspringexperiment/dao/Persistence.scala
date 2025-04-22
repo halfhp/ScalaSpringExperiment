@@ -2,7 +2,6 @@ package com.example.scalaspringexperiment.dao
 
 import cats.*
 import cats.effect.*
-import com.example.scalaspringexperiment.dao.Persistence
 import com.example.scalaspringexperiment.model.DomainModel
 import doobie.*
 import doobie.implicits.*
@@ -13,7 +12,6 @@ import org.springframework.stereotype.Service
 import scala.compiletime.uninitialized
 
 @Service
-@Autowired
 class Persistence {
 
   @Autowired
@@ -25,7 +23,8 @@ trait PersistenceLayer[T <: DomainModel] {
   val logger: Logger
   val persistence: Persistence
   val tableName: String
-  val insertRows: String
+  val allCols: Seq[String]
+  val insertCols: String
 
   // TODO - figure out how to get this working again
   // implicit val logHandler: LogHandler = LogHandler(evt => logger.info(evt.toString))
@@ -39,9 +38,11 @@ trait PersistenceLayer[T <: DomainModel] {
   )(
     implicit r: Read[T]
   ): IO[T] = persistence.ds.use { xa =>
+    val theTableName = Fragment.const0(tableName)
+    val theInsertRows = Fragment.const0(insertCols)
     for {
-      fr <- IO.pure(Fragment.const(s"INSERT into $tableName ($insertRows)") ++ fr" VALUES (" ++ insertValues(model) ++ fr")")
-      query <- IO(fr.update.withUniqueGeneratedKeys[T](Seq("") *))
+      sql <- IO(sql"INSERT INTO $theTableName ($theInsertRows) VALUES (${insertValues(model)})")
+      query <- IO(sql.update.withUniqueGeneratedKeys[T](allCols *))
       result <- query.transact(xa)
     } yield result
   }

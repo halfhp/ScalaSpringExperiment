@@ -1,5 +1,6 @@
 package com.example.scalaspringexperiment
 
+import cats.effect.unsafe.IORuntime
 import cats.effect.{IO, Resource}
 import com.example.scalaspringexperiment.util.CirceHttpMessageConverter
 import doobie.{DataSourceTransactor, ExecutionContexts}
@@ -15,14 +16,19 @@ class SpringConfig(
   dataSource: DataSource,
 ) {
 
+//  @Bean
+//  def customConverters(): HttpMessageConverters = {
+//    val circe = new CirceHttpMessageConverter()
+//    new HttpMessageConverters(circe)
+//  }
+
   @Bean
-  def customConverters(): HttpMessageConverters = {
-    val circe = new CirceHttpMessageConverter()
-    new HttpMessageConverters(circe)
+  def catsEffectIORuntime(): IORuntime = {
+    cats.effect.unsafe.implicits.global
   }
 
   @Bean
-  def getDoobieTransactor(): Resource[IO, DataSourceTransactor[IO]] = {
+  def doobieTransactor(): Resource[IO, DataSourceTransactor[IO]] = {
     for {
       ce <- ExecutionContexts.fixedThreadPool[IO](32) // our connect EC
     } yield Transactor.fromDataSource[IO](dataSource, ce)

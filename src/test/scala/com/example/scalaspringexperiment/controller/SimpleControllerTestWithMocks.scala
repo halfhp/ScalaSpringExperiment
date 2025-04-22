@@ -3,7 +3,7 @@ package com.example.scalaspringexperiment.controller
 import cats.effect.IO
 import com.example.scalaspringexperiment.controller.SimpleController
 import com.example.scalaspringexperiment.service.SimpleService
-import com.example.scalaspringexperiment.test.MyTestConfig
+import com.example.scalaspringexperiment.test.SpringTestConfig
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito.when
@@ -15,7 +15,7 @@ import org.springframework.test.context.bean.`override`.mockito.MockitoBean
 import scala.compiletime.uninitialized
 
 @SpringBootTest()
-@Import(Array(classOf[MyTestConfig]))
+@Import(Array(classOf[SpringTestConfig]))
 class SimpleControllerTestWithMocks {
 
   @Autowired

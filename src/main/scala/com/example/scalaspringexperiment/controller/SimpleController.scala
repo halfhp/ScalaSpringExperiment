@@ -41,8 +41,11 @@ class SimpleController(
   @PreAuthorize("permitAll()")
   @GetMapping(path = Array("/foo"))
   def getFoo(): Json = {
+    //implicit val v =  doobie.implicits.javatimedrivernative.JavaOffsetDateTimeMeta
+    import com.example.scalaspringexperiment.util.MyJsonCodecs.timestampCodec
     for {
-      fooList <- fooService.insert2(FooDomain(a = "new", b = 134))
+      fooList <- fooService.insert(FooDomain(a = "new", b = 134))
+      //fooList <- fooService.insert2(FooDomain(a = "new", b = 134))
       //result <- IO.pure(maybeFoo.fold(FooDomain(a = "oops", b = 999).asJson){ f => f.asJson })
       result <- IO.pure(fooList.asJson)
     } yield result

@@ -8,7 +8,7 @@ import javax.sql.DataSource
 
 @TestConfiguration
 @Profile(Array("test"))
-class MyTestConfig(
+class SpringTestConfig(
   dataSource: DataSource,
 ) extends SpringConfig(
   dataSource
