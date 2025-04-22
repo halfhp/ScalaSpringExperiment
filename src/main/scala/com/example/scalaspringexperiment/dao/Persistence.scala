@@ -23,15 +23,14 @@ trait PersistenceLayer[T <: DomainModel] {
   val logger: Logger
   val persistence: Persistence
   val tableName: String
-  val allCols: Seq[String]
   val insertCols: String
+  val tableInfo: TableInfo[T]
+
 
   // TODO - figure out how to get this working again
   // implicit val logHandler: LogHandler = LogHandler(evt => logger.info(evt.toString))
 
   def insertValues(model: T): Fragment
-
-  private val selectAllFragment = Fragment.const(s"SELECT * FROM $tableName")
 
   def insert(
     model: T
@@ -39,10 +38,10 @@ trait PersistenceLayer[T <: DomainModel] {
     implicit r: Read[T]
   ): IO[T] = persistence.ds.use { xa =>
     val theTableName = Fragment.const0(tableName)
-    val theInsertRows = Fragment.const0(insertCols)
+    val theInsertCols = Fragment.const0(insertCols)
     for {
-      sql <- IO(sql"INSERT INTO $theTableName ($theInsertRows) VALUES (${insertValues(model)})")
-      query <- IO(sql.update.withUniqueGeneratedKeys[T](allCols *))
+      sql <- IO(sql"INSERT INTO $theTableName ($theInsertCols) VALUES (${insertValues(model)})")
+      query <- IO(sql.update.withUniqueGeneratedKeys[T](tableInfo.columnNames *))
       result <- query.transact(xa)
     } yield result
   }

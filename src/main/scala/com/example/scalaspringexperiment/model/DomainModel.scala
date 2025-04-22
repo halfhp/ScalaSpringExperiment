@@ -1,11 +1,12 @@
 package com.example.scalaspringexperiment.model
 
+import com.example.scalaspringexperiment.dao.{Column, Table}
+
 import java.sql.Timestamp
 import java.time.OffsetDateTime
 
 object DomainModel {
   val NO_ID = 0L
-  //val NO_TIMESTAMP = OffsetDateTime.MIN
   val NO_TIMESTAMP = new Timestamp(0)
 }
 
@@ -23,10 +24,22 @@ case class BarDomain(
   d: Long
 ) extends DomainModel
 
+@Table("foo")
 case class FooDomain(
+
+  @Column("id")
   id: Long = DomainModel.NO_ID,
+
+  @Column("date_created")
   dateCreated: Timestamp = DomainModel.NO_TIMESTAMP,
+
+  @Column("last_updated")
   lastUpdated: Timestamp = DomainModel.NO_TIMESTAMP,
+
+  @Column("a")
   a: String,
+
+  @Column("b")
   b: Int
 ) extends DomainModel
+
