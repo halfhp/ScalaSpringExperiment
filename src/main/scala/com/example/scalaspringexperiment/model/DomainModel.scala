@@ -27,7 +27,7 @@ case class BarDomain(
 @Table("foo")
 case class FooDomain(
 
-  @Column("id")
+  @Column("id", true)
   id: Long = DomainModel.NO_ID,
 
   @Column("date_created")

@@ -22,9 +22,7 @@ class Persistence {
 trait PersistenceLayer[T <: DomainModel] {
   val logger: Logger
   val persistence: Persistence
-  val insertCols: String
   val tableInfo: TableInfo[T]
-
 
   // TODO - figure out how to get this working again
   // implicit val logHandler: LogHandler = LogHandler(evt => logger.info(evt.toString))
@@ -37,7 +35,7 @@ trait PersistenceLayer[T <: DomainModel] {
     implicit r: Read[T]
   ): IO[T] = persistence.ds.use { xa =>
     val theTableName = Fragment.const0(tableInfo.table.name)
-    val theInsertCols = Fragment.const0(insertCols)
+    val theInsertCols = Fragment.const0(tableInfo.insertColumnNames.mkString(","))
     for {
       sql <- IO(sql"INSERT INTO $theTableName ($theInsertCols) VALUES (${insertValues(model)})")
       query <- IO(sql.update.withUniqueGeneratedKeys[T](tableInfo.columnNames *))
