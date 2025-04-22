@@ -9,10 +9,6 @@ import doobie.implicits.*
 import doobie.util.fragment.*
 import cats.data.Chain
 import org.slf4j.Logger
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.stereotype.Service
-
-import scala.compiletime.uninitialized
 
 object DaoUtils {
 
