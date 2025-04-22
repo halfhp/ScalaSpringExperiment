@@ -15,7 +15,7 @@ import scala.util.chaining.*
 @SpringBootTest()
 @Import(Array(classOf[SpringTestConfig]))
 class PersonServiceTest {
-  
+
   @Autowired
   var personService: PersonService = uninitialized
 
@@ -37,6 +37,8 @@ class PersonServiceTest {
       age = 30
     )).unsafeRunSync().tap { person =>
       assert(person.id > 0)
+      assert(person.dateCreated.getTime > 0)
+      assert(person.lastUpdated.getTime > 0)
       assertEquals("John Doe", person.name)
       assertEquals(30, person.age)
     }
@@ -51,6 +53,8 @@ class PersonServiceTest {
 
     personService.findById(insertedPerson.id).unsafeRunSync().get.tap { person =>
       assertEquals(insertedPerson.id, person.id)
+      assertEquals(insertedPerson.dateCreated, person.dateCreated)
+      assertEquals(insertedPerson.lastUpdated, person.lastUpdated)
       assertEquals("John Doe", person.name)
       assertEquals(30, person.age)
     }
@@ -86,6 +90,7 @@ class PersonServiceTest {
       assert(updatedPerson.id == insertedPerson.id)
       assert(updatedPerson.name == "Jane Doe")
       assert(updatedPerson.age == 31)
+      assert(updatedPerson.lastUpdated.getTime > insertedPerson.lastUpdated.getTime)
     }
   }
 }

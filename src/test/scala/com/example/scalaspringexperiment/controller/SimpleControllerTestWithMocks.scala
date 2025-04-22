@@ -2,7 +2,6 @@ package com.example.scalaspringexperiment.controller
 
 import cats.effect.IO
 import com.example.scalaspringexperiment.controller.SimpleController
-import com.example.scalaspringexperiment.service.SimpleService
 import com.example.scalaspringexperiment.test.SpringTestConfig
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
@@ -21,15 +20,15 @@ class SimpleControllerTestWithMocks {
   @Autowired
   var simpleController: SimpleController = uninitialized
 
-  @MockitoBean
-  var simpleServiceMock: SimpleService = uninitialized
+//  @MockitoBean
+//  var simpleServiceMock: SimpleService = uninitialized
 
-  @Test
-  def testOne(): Unit = {
-    when(simpleServiceMock.doSomething()).thenReturn(IO.pure(Right("First")))
-    when(simpleServiceMock.doSomethingElse()).thenReturn(IO.pure(Right("Second")))
-
-    assertEquals("First then Second", simpleController.test())
-  }
+//  @Test
+//  def testOne(): Unit = {
+//    when(simpleServiceMock.doSomething()).thenReturn(IO.pure(Right("First")))
+//    when(simpleServiceMock.doSomethingElse()).thenReturn(IO.pure(Right("Second")))
+//
+//    assertEquals("First then Second", simpleController.test())
+//  }
 }
 

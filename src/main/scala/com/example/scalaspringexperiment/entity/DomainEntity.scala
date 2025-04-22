@@ -15,23 +15,15 @@ sealed trait DomainEntity {
   val lastUpdated: Timestamp
 }
 
-case class BarDomain(
-  id: Long = DomainEntity.NO_ID,
-  dateCreated: Timestamp = DomainEntity.NO_TIMESTAMP,
-  lastUpdated: Timestamp = DomainEntity.NO_TIMESTAMP,
-  c: String,
-  d: Long
-) extends DomainEntity
-
 @Table("person")
 case class Person(
   @Column("id", true)
   id: Long = DomainEntity.NO_ID,
 
-  @Column("date_created")
+  @Column("date_created", true)
   dateCreated: Timestamp = DomainEntity.NO_TIMESTAMP,
 
-  @Column("last_updated")
+  @Column("last_updated", true)
   lastUpdated: Timestamp = DomainEntity.NO_TIMESTAMP,
 
   @Column("name")
@@ -46,10 +38,10 @@ case class Address(
   @Column("id", true)
   id: Long = DomainEntity.NO_ID,
 
-  @Column("date_created")
+  @Column("date_created", true)
   dateCreated: Timestamp = DomainEntity.NO_TIMESTAMP,
 
-  @Column("last_updated")
+  @Column("last_updated", true)
   lastUpdated: Timestamp = DomainEntity.NO_TIMESTAMP,
 
   @Column("person_id")
@@ -63,24 +55,5 @@ case class Address(
 
   @Column("state")
   state: Option[String]
-) extends DomainEntity
-
-@Table("foo")
-case class FooDomain(
-
-  @Column("id", true)
-  id: Long = DomainEntity.NO_ID,
-
-  @Column("date_created")
-  dateCreated: Timestamp = DomainEntity.NO_TIMESTAMP,
-
-  @Column("last_updated")
-  lastUpdated: Timestamp = DomainEntity.NO_TIMESTAMP,
-
-  @Column("a")
-  a: String,
-
-  @Column("b")
-  b: Int
 ) extends DomainEntity
 

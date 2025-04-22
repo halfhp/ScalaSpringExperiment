@@ -13,7 +13,7 @@ class PersonService(
   override val ds: Resource[IO, DataSourceTransactor[IO]]
 ) extends Dao[Person] {
 
-  override val logger = LoggerFactory.getLogger(classOf[FooService])
+  override val logger = LoggerFactory.getLogger(classOf[PersonService])
   override val tableInfo: TableInfo[Person] = TableInfo.build[Person]()
   override implicit val reader: Read[Person] = Read.derived
   override implicit val writer: Write[Person] = Write.derived
