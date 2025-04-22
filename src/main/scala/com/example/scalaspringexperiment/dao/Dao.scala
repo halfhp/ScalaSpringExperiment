@@ -67,14 +67,14 @@ trait Dao[T <: DomainEntity] {
   val ds: Resource[IO, DataSourceTransactor[IO]]
   val tableInfo: TableInfo[T]
 
+  implicit val reader: Read[T]
+  implicit val writer: Write[T]
+
   // TODO - figure out how to get this working again
   // implicit val logHandler: LogHandler = LogHandler(evt => logger.info(evt.toString))
 
   def insert(
     model: T
-  )(
-    implicit r: Read[T],
-    w: Write[T]
   ): IO[T] = ds.use { xa =>
     val theTableName = Fragment.const0(tableInfo.table.name)
     val theInsertCols = Fragment.const0(tableInfo.insertColumnNames.mkString(","))
@@ -93,8 +93,6 @@ trait Dao[T <: DomainEntity] {
 
   def delete(
     model: T
-  )(
-    implicit r: Read[T]
   ): IO[Option[T]] = ds.use { xa =>
     val q =
       sql"""
@@ -109,8 +107,6 @@ WHERE id = ${model.id}
 
   def findById(
     id: Long
-  )(
-    implicit r: Read[T]
   ): IO[Option[T]] = ds.use { xa =>
     (Fragment.const(s"select * from ${tableInfo.table.name} where id = ") ++ fr"$id LIMIT 1").query[T]
       .option
