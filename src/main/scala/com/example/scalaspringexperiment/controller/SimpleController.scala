@@ -4,7 +4,7 @@ import cats.data.EitherT
 import com.example.scalaspringexperiment.service.{FooService, SimpleService}
 import cats.effect.IO
 import cats.effect.unsafe.implicits.global
-import com.example.scalaspringexperiment.model.FooDomain
+import com.example.scalaspringexperiment.entity.FooDomain
 import doobie.implicits.*
 import io.circe.*
 import io.circe.generic.auto.*

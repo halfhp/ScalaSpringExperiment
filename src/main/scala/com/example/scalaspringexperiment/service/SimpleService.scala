@@ -2,7 +2,7 @@ package com.example.scalaspringexperiment.service
 
 import cats.effect.IO
 import cats.implicits.*
-import com.example.scalaspringexperiment.model.FooDomain
+import com.example.scalaspringexperiment.entity.FooDomain
 import org.springframework.stereotype.Service
 
 @Service

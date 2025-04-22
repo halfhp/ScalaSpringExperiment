@@ -2,7 +2,7 @@ package com.example.scalaspringexperiment.dao
 
 import cats.*
 import cats.effect.*
-import com.example.scalaspringexperiment.model.DomainModel
+import com.example.scalaspringexperiment.entity.DomainEntity
 import doobie.*
 import doobie.implicits.*
 import doobie.util.fragment.*
@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service
 
 import scala.compiletime.uninitialized
 
-object PersistenceUtils {
+object DaoUtils {
 
   /**
    * This is a workaround to adjust the properties of a Fragment.
@@ -54,17 +54,17 @@ object PersistenceUtils {
   }
 }
 
-@Service
-class Persistence {
+//@Service
+//class Persistence {
+//
+//  @Autowired
+//  var ds: Resource[IO, DataSourceTransactor[IO]] = uninitialized
+//
+//}
 
-  @Autowired
-  var ds: Resource[IO, DataSourceTransactor[IO]] = uninitialized
-
-}
-
-trait PersistenceLayer[T <: DomainModel] {
+trait Dao[T <: DomainEntity] {
   val logger: Logger
-  val persistence: Persistence
+  val ds: Resource[IO, DataSourceTransactor[IO]]
   val tableInfo: TableInfo[T]
 
   // TODO - figure out how to get this working again
@@ -75,10 +75,10 @@ trait PersistenceLayer[T <: DomainModel] {
   )(
     implicit r: Read[T],
     w: Write[T]
-  ): IO[T] = persistence.ds.use { xa =>
+  ): IO[T] = ds.use { xa =>
     val theTableName = Fragment.const0(tableInfo.table.name)
     val theInsertCols = Fragment.const0(tableInfo.insertColumnNames.mkString(","))
-    val insertValues = PersistenceUtils.insertValuesFr(model, tableInfo)
+    val insertValues = DaoUtils.insertValuesFr(model, tableInfo)
     for {
       sql <- IO(sql"INSERT INTO $theTableName ($theInsertCols) VALUES ($insertValues)")
       query <- IO(sql.update.withUniqueGeneratedKeys[T](tableInfo.columnNames *))
@@ -95,7 +95,7 @@ trait PersistenceLayer[T <: DomainModel] {
     model: T
   )(
     implicit r: Read[T]
-  ): IO[Option[T]] = persistence.ds.use { xa =>
+  ): IO[Option[T]] = ds.use { xa =>
     val q =
       sql"""
 DELETE FROM ${tableInfo.table.name}
@@ -111,7 +111,7 @@ WHERE id = ${model.id}
     id: Long
   )(
     implicit r: Read[T]
-  ): IO[Option[T]] = persistence.ds.use { xa =>
+  ): IO[Option[T]] = ds.use { xa =>
     (Fragment.const(s"select * from ${tableInfo.table.name} where id = ") ++ fr"$id LIMIT 1").query[T]
       .option
       .transact(xa)

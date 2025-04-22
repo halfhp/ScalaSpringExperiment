@@ -1,15 +1,16 @@
 package com.example.scalaspringexperiment.test
 
-import cats.effect.IO
+import cats.effect.{IO, Resource}
 import cats.effect.unsafe.IORuntime
-import com.example.scalaspringexperiment.dao.Persistence
+import doobie.DataSourceTransactor
 import doobie.implicits.toSqlInterpolator
 import org.springframework.stereotype.Service
 import doobie.syntax.all.*
 
 @Service
 class TestUtils(
-  val persistence: Persistence,
+  //val persistence: Persistence,
+  val ds: Resource[IO, DataSourceTransactor[IO]],
   implicit val runtime: IORuntime
 ) {
 
@@ -24,7 +25,7 @@ class TestUtils(
   //  }
 
   def resetDatabase(): Unit = {
-    persistence.ds.use { xa =>
+    ds.use { xa =>
       for {
         tables <- sql"""
                        |SELECT table_name
