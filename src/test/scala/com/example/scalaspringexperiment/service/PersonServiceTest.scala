@@ -15,6 +15,7 @@ import scala.util.chaining.*
 @SpringBootTest()
 @Import(Array(classOf[SpringTestConfig]))
 class PersonServiceTest {
+  
   @Autowired
   var personService: PersonService = uninitialized
 
@@ -32,7 +33,6 @@ class PersonServiceTest {
   @Test
   def insert_insertsPerson(): Unit = {
     personService.insert(Person(
-      id = 0,
       name = "John Doe",
       age = 30
     )).unsafeRunSync().tap { person =>
@@ -45,7 +45,6 @@ class PersonServiceTest {
   @Test
   def findById_returnsPerson(): Unit = {
     val insertedPerson = personService.insert(Person(
-      id = 0,
       name = "John Doe",
       age = 30
     )).unsafeRunSync()
@@ -54,6 +53,39 @@ class PersonServiceTest {
       assertEquals(insertedPerson.id, person.id)
       assertEquals("John Doe", person.name)
       assertEquals(30, person.age)
+    }
+  }
+
+  @Test
+  def delete_deletesPerson(): Unit = {
+    val insertedPerson = personService.insert(Person(
+      name = "John Doe",
+      age = 30
+    )).unsafeRunSync()
+
+    personService.delete(insertedPerson).unsafeRunSync().tap { deletedCount =>
+      assert(deletedCount == 1)
+    }
+
+    personService.findById(insertedPerson.id).unsafeRunSync().tap { maybePerson =>
+      assert(maybePerson.isEmpty)
+    }
+  }
+
+  @Test
+  def update_updatesPerson(): Unit = {
+    val insertedPerson = personService.insert(Person(
+      name = "John Doe",
+      age = 30
+    )).unsafeRunSync()
+
+    personService.update(insertedPerson.copy(
+      name = "Jane Doe",
+      age = 31
+    )).unsafeRunSync().tap { updatedPerson =>
+      assert(updatedPerson.id == insertedPerson.id)
+      assert(updatedPerson.name == "Jane Doe")
+      assert(updatedPerson.age == 31)
     }
   }
 }
