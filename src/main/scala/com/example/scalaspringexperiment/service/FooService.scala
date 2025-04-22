@@ -20,8 +20,6 @@ class FooService(
 ) extends PersistenceLayer[FooDomain] {
 
   override val logger = LoggerFactory.getLogger(classOf[FooService])
-
-  override val tableName = "foo"
   override val tableInfo: TableInfo[FooDomain] = TableInfo.build[FooDomain]()
   override val insertCols = "date_created,last_updated,a,b"
 

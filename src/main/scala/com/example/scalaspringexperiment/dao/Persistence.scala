@@ -22,7 +22,6 @@ class Persistence {
 trait PersistenceLayer[T <: DomainModel] {
   val logger: Logger
   val persistence: Persistence
-  val tableName: String
   val insertCols: String
   val tableInfo: TableInfo[T]
 
@@ -37,7 +36,7 @@ trait PersistenceLayer[T <: DomainModel] {
   )(
     implicit r: Read[T]
   ): IO[T] = persistence.ds.use { xa =>
-    val theTableName = Fragment.const0(tableName)
+    val theTableName = Fragment.const0(tableInfo.table.name)
     val theInsertCols = Fragment.const0(insertCols)
     for {
       sql <- IO(sql"INSERT INTO $theTableName ($theInsertCols) VALUES (${insertValues(model)})")
@@ -58,7 +57,7 @@ trait PersistenceLayer[T <: DomainModel] {
   ): IO[Option[T]] = persistence.ds.use { xa =>
     val q =
       sql"""
-DELETE FROM $tableName
+DELETE FROM ${tableInfo.table.name}
 WHERE id = ${model.id}
 """
     for {
@@ -72,7 +71,7 @@ WHERE id = ${model.id}
   )(
     implicit r: Read[T]
   ): IO[Option[T]] = persistence.ds.use { xa =>
-    (Fragment.const(s"select * from $tableName where id = ") ++ fr"$id LIMIT 1").query[T]
+    (Fragment.const(s"select * from ${tableInfo.table.name} where id = ") ++ fr"$id LIMIT 1").query[T]
       .option
       .transact(xa)
   }
