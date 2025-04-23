@@ -3,8 +3,8 @@ package com.example.scalaspringexperiment.controller
 import cats.effect.unsafe.IORuntime
 import com.example.scalaspringexperiment.entity.Person
 import com.example.scalaspringexperiment.service.{AddressService, PersonService}
-import com.example.scalaspringexperiment.test.SpringTestConfig
-import org.junit.jupiter.api.Test
+import com.example.scalaspringexperiment.test.{SpringTestConfig, TestUtils}
+import org.junit.jupiter.api.{BeforeEach, Test}
 import org.mockito.Mockito.{times, verify}
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
@@ -28,6 +28,14 @@ class SimpleControllerTestWithExpectations {
 
   @Autowired
   implicit var runtime: IORuntime = uninitialized
+
+  @Autowired
+  var testUtils: TestUtils = uninitialized
+
+  @BeforeEach
+  def beforeEach(): Unit = {
+    testUtils.truncateTables()
+  }
 
   @Test
   def testGetDetailedPerson_invokesExpectedServiceMethods(): Unit = {

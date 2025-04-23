@@ -37,7 +37,7 @@ class SimpleControllerTestWithMockMvc {
 
   @BeforeEach
   def beforeEach(): Unit = {
-    testUtils.resetDatabase()
+    testUtils.truncateTables()
   }
 
   @Test

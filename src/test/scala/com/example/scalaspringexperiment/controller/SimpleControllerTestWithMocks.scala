@@ -4,11 +4,11 @@ import cats.effect.IO
 import cats.effect.unsafe.IORuntime
 import com.example.scalaspringexperiment.entity.Person
 import com.example.scalaspringexperiment.service.{AddressService, PersonService}
-import com.example.scalaspringexperiment.test.SpringTestConfig
+import com.example.scalaspringexperiment.test.{SpringTestConfig, TestUtils}
 import io.circe.generic.auto.*
 import com.example.scalaspringexperiment.util.MyJsonCodecs.timestampCodec
 import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.{BeforeEach, Test}
 import org.mockito.ArgumentMatchers.anyLong
 import org.mockito.Mockito.when
 import org.springframework.beans.factory.annotation.Autowired
@@ -34,6 +34,14 @@ class SimpleControllerTestWithMocks {
 
   @Autowired
   implicit var runtime: IORuntime = uninitialized
+
+  @Autowired
+  var testUtils: TestUtils = uninitialized
+
+  @BeforeEach
+  def beforeEach(): Unit = {
+    testUtils.truncateTables()
+  }
 
   @Test
   def getDetailedPerson_rendersDetailedPersonJson(): Unit = {

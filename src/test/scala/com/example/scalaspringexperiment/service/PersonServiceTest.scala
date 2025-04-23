@@ -27,7 +27,7 @@ class PersonServiceTest {
 
   @BeforeEach
   def beforeEach(): Unit = {
-    testUtils.resetDatabase()
+    testUtils.truncateTables()
   }
 
   @Test

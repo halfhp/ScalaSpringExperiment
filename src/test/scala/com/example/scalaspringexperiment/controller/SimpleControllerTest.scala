@@ -26,14 +26,14 @@ class SimpleControllerTest {
   var personService: PersonService = uninitialized
 
   @Autowired
-  var testUtils: TestUtils = uninitialized
+  implicit var runtime: IORuntime = uninitialized
 
   @Autowired
-  implicit var runtime: IORuntime = uninitialized
+  var testUtils: TestUtils = uninitialized
 
   @BeforeEach
   def beforeEach(): Unit = {
-    testUtils.resetDatabase()
+    testUtils.truncateTables()
   }
 
   @Test
