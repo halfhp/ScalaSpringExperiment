@@ -18,6 +18,10 @@ that it makes sense to use Scala 3 for new projects.
 I'll try to keep this project updated
 with things I learn as I go.
 
+# How to Run
+For convenience this project includes a [docker-compose environment](docker-compose.yml) that provisions a postgres database and configures
+the app to use it.
+
 # Libraries and Frameworks Used
 
 * Gradle[^1]
