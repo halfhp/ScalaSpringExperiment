@@ -6,14 +6,14 @@ Demonstrates using Spring Framework with Scala 3.
 Since the initial release of Scala 3 I've considered upgrading various 
 non-trivial personal and professional projects from 2.13 to 3, but until recently (2025) always ultimately declined to upgrade.   
 
-After getting over the various deprecation hurdles,
+After getting over the deprecation hurdles,
 The biggest headaches have been with the level of compatibility tools like IntellIJ offer, and the relatively small market share
-scala 3 currently has for Scala projects and libraries.
+scala 3 currently has of Scala projects and libraries.
 Builds can also slow to a crawl or hang during non-trivial refactorings.  Compile times
 are also up, and builds will randomly fail, only to succeed after a second or third retry. 
 
-The jury is still out on whether the migration is worthwhile for most existing projects.  I am reasonably convinced at this point, however, 
-that it makes sense to use Scala 3 for new projects.
+The jury is still out on whether the migration is worthwhile for established projects, but
+as of 2025 I do feel like Scala 3 is the way to go.
 
 I'll try to keep this project updated
 with things I learn as I go.
