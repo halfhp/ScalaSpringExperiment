@@ -21,7 +21,6 @@ import scala.language.implicitConversions
  * as a simplified example.  The AsyncController (TODO) is a more realistic example for production use.
  */
 @RestController
-@Autowired
 class SimpleController(
   personService: PersonService,
   addressService: AddressService
