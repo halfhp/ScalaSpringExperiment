@@ -18,6 +18,8 @@ as of 2025 I do feel like Scala 3 is the way to go.
 I'll try to keep this project updated
 with things I learn as I go.
 
+:speech_balloon: **Questions / comments / suggestions are welcome in the [discussions](https://github.com/halfhp/ScalaSpringExperiment/discussions), or feel free to [contact me](mailto:halfhp@gmail.com) directly.**
+
 # How to Run
 For convenience this project includes a [docker-compose environment](docker-compose.yml) that provisions a postgres database and configures
 the app to use it.
