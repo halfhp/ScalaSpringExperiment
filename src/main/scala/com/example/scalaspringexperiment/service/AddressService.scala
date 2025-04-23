@@ -20,13 +20,13 @@ class AddressService(
   override implicit val reader: Read[Address] = Read.derived
   override implicit val writer: Write[Address] = Write.derived
 
-  def findByUserId(
-    id: Long
+  def findByPersonId(
+    personId: Long
   ): IO[Seq[Address]] = ds.use { xa =>
     val theTableName = Fragment.const0(tableInfo.table.name)
     sql"""
       SELECT * FROM $theTableName
-      WHERE person_id = $id
+      WHERE person_id = $personId
     """.query[Address].to[Seq].transact(xa)
   }
 }

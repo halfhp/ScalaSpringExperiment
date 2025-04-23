@@ -11,6 +11,7 @@ import io.circe.generic.auto.*
 import io.circe.syntax.*
 import com.example.scalaspringexperiment.util.MyJsonCodecs.timestampCodec
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.context.annotation.Lazy
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.*
 
@@ -43,13 +44,13 @@ class SimpleController(
   ): Json = {
     (for {
       person <- OptionT(personService.findById(id))
-      addresses <- OptionT.liftF(addressService.findByUserId(id))
+      addresses <- OptionT.liftF(addressService.findByPersonId(id))
     } yield Json.obj(
       "person" -> person.asJson,
       "addresses" -> addresses.asJson
     )).value.getOrElse(Json.obj())
   }
-  
+
 
 //  @PreAuthorize("permitAll()")
 //  @GetMapping(path = Array("/scala"))
