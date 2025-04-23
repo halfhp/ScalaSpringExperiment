@@ -1,10 +1,15 @@
 package com.example.scalaspringexperiment.controller
 
 import cats.effect.IO
-import com.example.scalaspringexperiment.controller.SimpleController
+import cats.effect.unsafe.IORuntime
+import com.example.scalaspringexperiment.entity.Person
+import com.example.scalaspringexperiment.service.{AddressService, PersonService}
 import com.example.scalaspringexperiment.test.SpringTestConfig
+import io.circe.generic.auto.*
+import com.example.scalaspringexperiment.util.MyJsonCodecs.timestampCodec
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
+import org.mockito.ArgumentMatchers.anyLong
 import org.mockito.Mockito.when
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
@@ -12,6 +17,7 @@ import org.springframework.context.annotation.Import
 import org.springframework.test.context.bean.`override`.mockito.MockitoBean
 
 import scala.compiletime.uninitialized
+import scala.util.chaining.*
 
 @SpringBootTest()
 @Import(Array(classOf[SpringTestConfig]))
@@ -20,15 +26,25 @@ class SimpleControllerTestWithMocks {
   @Autowired
   var simpleController: SimpleController = uninitialized
 
-//  @MockitoBean
-//  var simpleServiceMock: SimpleService = uninitialized
+  @MockitoBean
+  var personService: PersonService = uninitialized
 
-//  @Test
-//  def testOne(): Unit = {
-//    when(simpleServiceMock.doSomething()).thenReturn(IO.pure(Right("First")))
-//    when(simpleServiceMock.doSomethingElse()).thenReturn(IO.pure(Right("Second")))
-//
-//    assertEquals("First then Second", simpleController.test())
-//  }
+  @MockitoBean
+  var addressService: AddressService = uninitialized
+
+  @Autowired
+  implicit var runtime: IORuntime = uninitialized
+
+  @Test
+  def getDetailedPerson_rendersDetailedPersonJson(): Unit = {
+    val person = Person(id = 123, name = "John Doe", age = 30)
+    when(personService.findById(anyLong())).thenReturn(IO.pure(Some(person)))
+    when(addressService.findByPersonId(anyLong())).thenReturn(IO.pure(List()))
+
+    simpleController.getDetailedPerson(person.id).tap { json =>
+      val decodedPerson = json.hcursor.get[Person]("person").getOrElse(???)
+      assertEquals(person.id, decodedPerson.id)
+    }
+  }
 }
 
