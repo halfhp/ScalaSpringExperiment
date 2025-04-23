@@ -32,8 +32,8 @@ SBT I believe might have some minor performance benefits, but you really cant Gr
 preferred tool for structured concurrency.  2) Doobie is oriented around writing pure SQL and producing results as immutable case classes which I prefer over ORM approaches etc. that involve things like Hibernate, JPA, "live objects", etc.
 
 # Challenges & Annoyances
-As far as getting Spring and Scala to play nicely together, the challenges are relatively minor and can either be resolved
-once in your codebase and forgotten about, or are things that are a just a matter of getting used to.
+As far as getting Spring and Scala to play nicely together, the challenges are fairly minor and can either be resolved
+once in your codebase and forgotten about, or are things that are a just take some getting used to.
 
 Probably the most important one to be aware of here relates to async programming.  If you plan to use any form of Scala flavored structured concurrency,
 whether it be Futures, Cats Effect, ZIO, or something else, you are going to need to adapt the Spring async programming model to work with it or 
@@ -85,15 +85,12 @@ I've not gotten around to adding this to the example yet, but it is doable, and 
 about it.
 
 # Future Improvements
-Things I now know how to do right, that I did not include in this example, or did badly.
+## Things I know how to do but have not gotten around to
 
-## Async -> IO conversions in Rest controllers
+### Async -> IO conversions in Rest controllers
 TODO
 
-## Fleshed Out DAO
-TODO
-
-## More Unit & Integration Test Examples
+## Things I dont know how to do yet
 TODO
 
 
