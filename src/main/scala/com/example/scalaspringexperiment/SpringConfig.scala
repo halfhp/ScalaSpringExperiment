@@ -6,21 +6,26 @@ import com.example.scalaspringexperiment.util.CirceHttpMessageConverter
 import doobie.{DataSourceTransactor, ExecutionContexts}
 import doobie.util.transactor.Transactor
 import org.springframework.boot.autoconfigure.http.HttpMessageConverters
-import org.springframework.boot.jdbc.DataSourceBuilder
-import org.springframework.context.annotation.{Bean, Configuration, Lazy}
+import org.springframework.context.annotation.{Bean, Configuration}
+import org.springframework.security.config.Customizer
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity
+import org.springframework.security.config.annotation.web.builders.HttpSecurity
+import org.springframework.security.config.http.SessionCreationPolicy
+import org.springframework.security.web.SecurityFilterChain
 
 import javax.sql.DataSource
 
 @Configuration
+@EnableMethodSecurity(prePostEnabled = true)
 class SpringConfig(
   dataSource: DataSource,
 ) {
 
-//  @Bean
-//  def customConverters(): HttpMessageConverters = {
-//    val circe = new CirceHttpMessageConverter()
-//    new HttpMessageConverters(circe)
-//  }
+  @Bean
+  def getCustomConverters(): HttpMessageConverters = {
+    val circe = new CirceHttpMessageConverter()
+    new HttpMessageConverters(circe)
+  }
 
   @Bean
   def catsEffectIORuntime(): IORuntime = {
@@ -34,26 +39,19 @@ class SpringConfig(
     } yield Transactor.fromDataSource[IO](dataSource, ce)
   }
 
-//  @Bean
-//  def dataSource(): DataSource = {
-//    DataSourceBuilder.create()
-//      .driverClassName("org.postgresql.Driver")
-//      .url("jdbc:postgresql://localhost:5432/springtest")
-//      .username("postgres")
-//      .password("ou812")
-//      .build()
-//  }
-}
+  @Bean
+  def securityFilterChain(
+    http: HttpSecurity
+  ): SecurityFilterChain = {
+    http
+      .cors(Customizer.withDefaults())
 
-// TODO: fixme
-//@Configuration
-//@EnableGlobalMethodSecurity(
-//  prePostEnabled = true,
-//  securedEnabled = true
-//)
-//class SecurityConfig extends WebSecurityConfigurerAdapter {
-//  override  def configure(http: HttpSecurity) = {
-//    http.csrf().disable() // TODO: figure out why this is causing POST to return 403
-//  }
-//}
+      // we'll be using stateless JWT authentication, and csrf messes with mockmvc tests
+      // so we're disabling csrf.  alternatively, this could be disabled only for testing
+      // in the test config.
+      .csrf(csrf => csrf.disable())
+      .sessionManagement(sm => sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+      .build()
+  }
+}
 

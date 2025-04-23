@@ -20,7 +20,6 @@ import scala.language.implicitConversions
  * The simplest controller possible.  Not something one would actually use in a serious project, but still useful
  * as a simplified example.  The AsyncController (TODO) is a more realistic example for production use.
  */
-@PreAuthorize("true")
 @RestController
 @Autowired
 class SimpleController(
