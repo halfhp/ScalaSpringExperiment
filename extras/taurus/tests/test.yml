@@ -22,8 +22,8 @@ scenarios:
       - url: http://host.docker.internal:8080/
         method: GET
 
-settings:
-  artifacts-dir: /output
+#settings:
+#  artifacts-dir: /output
 
 reporting:
   - module: console
@@ -31,3 +31,8 @@ reporting:
     summary: true
 #  - module: junit-xml
 #    filename: /output/results.xml
+
+monitoring:
+  - module: local
+    cpu: true
+    memory: true
