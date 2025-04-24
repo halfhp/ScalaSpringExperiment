@@ -93,8 +93,19 @@ Even after adapting these mechanisms we are left with having to manage an additi
 The other challenge here is adapting the handling of uncaught exceptions so that Spring's conventional mechanisms will 
 continue to function.
 
-I've not gotten around to adding this to the example yet, but it is doable, and once it's done you can pretty much forget
-about it.
+### Async Controllers
+The original version of this project used WebMVC which is built on top of Apache Tomcat and has its own async programming model.
+I've since switched to using WebFlux which is built on top of Netty and is generally considered to be more performant, particularly
+when it comes to servicing large numbers of requests concurrently.  I would not be surprised if this changes in the future
+thanks to the work being done on Project Loom.  For those interested in exploring this further, check out the webmvc tag
+of this repository.
+
+### Async Database Drivers
+This project uses Doobie, which is built on top of JDBC which is synchronous.  There is another library, Skunk, which is written
+by the same author and offers similar functionality.  It's fully asynchronous but also locks you into using Postgres.
+
+Another option would be to use one Spring's database facilities that supports R2DBC, which is also async.  I've not tried this approach
+yet but imagine it could be wrapped with cats-effect IO similarly to what was done with [Mono] in the controller layer.
 
 # Future Improvements
 ## Spring Security
