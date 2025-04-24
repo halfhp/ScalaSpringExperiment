@@ -18,7 +18,6 @@ class CirceJsonEncoder extends Encoder[io.circe.Json] {
     mimeType == null || mimeType.isCompatibleWith(MediaType.APPLICATION_JSON)
 
   override def encode(inputStream: Publisher[_ <: io.circe.Json], bufferFactory: DataBufferFactory, elementType: ResolvableType, mimeType: MimeType, hints: util.Map[String, AnyRef]): Flux[DataBuffer] = {
-    println(s"[CIRCE] Encoding Json")
     Flux.from(inputStream).map { json =>
       val bytes = json.noSpaces.getBytes(StandardCharsets.UTF_8)
       val buffer = bufferFactory.wrap(bytes)
