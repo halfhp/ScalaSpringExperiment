@@ -2,7 +2,6 @@ package com.example.scalaspringexperiment.test
 
 import cats.effect.{IO, Resource}
 import cats.effect.unsafe.IORuntime
-import com.example.scalaspringexperiment.dao.Dao
 import com.example.scalaspringexperiment.entity.Person
 import com.example.scalaspringexperiment.service.PersonService
 import com.github.javafaker.Faker
@@ -11,13 +10,8 @@ import doobie.implicits.toSqlInterpolator
 import org.springframework.stereotype.Service
 import doobie.syntax.all.*
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.context.ApplicationContext
 
 import scala.compiletime.uninitialized
-import scala.jdk.CollectionConverters.*
-import scala.annotation.StaticAnnotation
-
-case class Table(name: String) extends StaticAnnotation
 
 @Service
 class TestUtils(
@@ -28,9 +22,6 @@ class TestUtils(
   @Autowired
   var personService: PersonService = uninitialized
 
-  @Autowired
-  var applicationContext: ApplicationContext = uninitialized
-
   val faker = new Faker()
 
   private val ignoredTables = Seq(
@@ -40,19 +31,15 @@ class TestUtils(
     "spatial_ref_sys",
   )
 
-  def getAllDaos(): Seq[Dao[?]] = {
-    applicationContext
-      .getBeansOfType(classOf[Dao[?]])
-      .values()
-      .asScala
-      .toSeq
-  }
-
+  // TODO: this isn't ideal; as new extensions etc. get installed, this approach can mangle them.
+  // TODO: a more ideal approach would be sealing the entity trait and enumerating the table annotations
+  // TODO: from there, but sealing means storing all entities in a single file, which isnt great either.
   def truncateTables(): Unit = {
     println("TRUNCATING ALL TABLES")
     ds.use { xa =>
       for {
-        tables <- IO(getAllDaos().map(_.tableInfo.table.name))
+        tables <- sql"SELECT table_name FROM information_schema.tables WHERE table_schema = 'public'"
+          .query[String].to[List].transact(xa)
         results <- IO {
           tables.filter(!ignoredTables.contains(_)).map { table =>
             val theTableName = Fragment.const0(table)
