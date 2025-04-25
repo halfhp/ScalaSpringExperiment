@@ -81,20 +81,33 @@ This means that whenever you are working with variables coming Spring, you gener
 One particular place to watch out for this is when using Spring's `@RequestParam` and `@PathVariable` annotations in controllers.
 
 ## Spring's ThreadLocal Context
-Much of Spring's async programming model relies on ThreadLocal context.  This used to be a common pattern in Java, but not one that is used in Scala.
+Much of Spring's async programming model relies on ThreadLocal context, particularly when using WebMVC.  This used to be a common pattern in Java, but not one that is used in Scala.
 This becomes particularly annoying when interfacing between things like controller entry points and services and utilities that are built
 around IO/Future/ZIO etc. monads.  Effectively, trying to access something like Spring Security's SecurityContext from these methods
-will not work.  The best solution I have found is to pass the SecurityContext and any other ThreadLocal context as an argument to
+will not work.  Without going into too much detail WebFlux has the same basic problem, even though its not technically using ThreadLocal context.
+
+The best solution I have found is to pass the SecurityContext and any other ThreadLocal / pseudo global context data as an argument to
 these methods.  This is not ideal, but it is the best solution I have found so far.
 
 ## Async Programming 
 Spring has it's own mechanisms for async programming, and it takes some work to adapt it to be compatible with IO monads.
-Even after adapting these mechanisms we are left with having to manage an additional threadpool to accommodate Spring.
-The other challenge here is adapting the handling of uncaught exceptions so that Spring's conventional mechanisms will 
+Even after adapting these mechanisms we are left with having to manage an additional threadpool(s) to accommodate Spring.
+Another challenge here is adapting the handling of uncaught exceptions so that Spring's conventional mechanisms will 
 continue to function.
 
-I've not gotten around to adding this to the example yet, but it is doable, and once it's done you can pretty much forget
-about it.
+### Async Controllers
+The original version of this project used WebMVC which is built on top of Apache Tomcat and has its own async programming model.
+I've since switched to using WebFlux which is built on top of Netty and is generally considered to be more performant, particularly
+when it comes to servicing large numbers of requests concurrently.  I would not be surprised if this changes in the future
+thanks to the work being done on Project Loom.  For those interested in exploring this further, check out the [webmvc tag](https://github.com/halfhp/ScalaSpringExperiment/releases/tag/webmvc)
+of this repository.
+
+### Async Database Drivers
+This project uses Doobie, which is built on top of JDBC which is synchronous.  There is another library, Skunk, which is written
+by the same author and offers similar functionality.  It's fully asynchronous but also locks you into using Postgres.
+
+Another option would be to use one Spring's database facilities that supports R2DBC, which is also async.  I've not tried this approach
+yet but imagine it could be wrapped with cats-effect IO similarly to what was done with [Mono] in the controller layer.
 
 # Future Improvements
 ## Spring Security

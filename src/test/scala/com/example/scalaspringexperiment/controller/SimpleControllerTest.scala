@@ -4,18 +4,15 @@ import cats.effect.unsafe.IORuntime
 import com.example.scalaspringexperiment.entity.Person
 import com.example.scalaspringexperiment.service.PersonService
 import com.example.scalaspringexperiment.test.{SpringTestConfig, TestUtils}
-import io.circe.generic.auto.*
-import com.example.scalaspringexperiment.util.MyJsonCodecs.timestampCodec
-import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.{BeforeEach, Test}
-import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.annotation.Import
+import org.springframework.test.web.reactive.server.WebTestClient
 
 import scala.compiletime.uninitialized
-import scala.util.chaining.*
 
-@SpringBootTest()
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Import(Array(classOf[SpringTestConfig]))
 class SimpleControllerTest {
 
@@ -26,10 +23,13 @@ class SimpleControllerTest {
   var personService: PersonService = uninitialized
 
   @Autowired
+  var testUtils: TestUtils = uninitialized
+
+  @Autowired
   implicit var runtime: IORuntime = uninitialized
 
   @Autowired
-  var testUtils: TestUtils = uninitialized
+  var webTestClient: WebTestClient = uninitialized
 
   @BeforeEach
   def beforeEach(): Unit = {
@@ -37,17 +37,25 @@ class SimpleControllerTest {
   }
 
   @Test
-  def testGetDetailedPerson(): Unit = {
+  def getDetailedPersonById_returnsPerson(): Unit = {
     val person = personService.insert(
       Person(name = "John Doe", age = 30)
     ).unsafeRunSync()
 
-    val result = simpleController.getDetailedPerson(person.id)
+    webTestClient.get()
+      .uri(s"/person/${person.id}/detailed")
+      .exchange()
+      .expectStatus().isOk
+      .expectBody()
+      .jsonPath("$.person.name").isEqualTo("John Doe")
+      .jsonPath("$.person.age").isEqualTo(30)
+  }
 
-    result.hcursor.get[Person]("person").getOrElse(???).tap { p =>
-      assertEquals(person.id, p.id)
-      assertEquals(person.name, p.name)
-    }
+  @Test
+  def getDetailedPersonById_returns404_ifPersonNotFound(): Unit = {
+    webTestClient.get()
+      .uri("/person/999/detailed")
+      .exchange()
+      .expectStatus().isNotFound
   }
 }
-

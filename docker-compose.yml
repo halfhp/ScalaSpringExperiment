@@ -2,12 +2,12 @@ version: '3.8'
 
 services:
   sse_app:
+    container_name: sse_app
     build:
       context: .
       dockerfile: Dockerfile
     ports:
       - "8080:8080"
-    container_name: sse_app
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://sse_postgres:5432/postgres
       SPRING_DATASOURCE_USERNAME: postgres
@@ -16,8 +16,8 @@ services:
       - sse_postgres
 
   sse_postgres:
-    image: postgres:15
     container_name: sse_postgres
+    image: postgres:15
     environment:
       POSTGRES_DB: postgres
       POSTGRES_USER: postgres

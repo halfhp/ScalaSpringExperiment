@@ -21,7 +21,7 @@ repositories {
 dependencies {
     implementation 'org.scala-lang:scala3-library_3:3.6.4'
     implementation 'org.typelevel:cats-effect_3:3.6.1'
-    implementation('org.springframework.boot:spring-boot-starter-web') {
+    implementation("org.springframework.boot:spring-boot-starter-webflux") {
         exclude group: 'com.fasterxml.jackson.core'
         exclude group: 'com.fasterxml.jackson.datatype'
         exclude group: 'com.fasterxml.jackson.module'
@@ -55,6 +55,10 @@ dependencies {
     annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
+    testImplementation('com.github.javafaker:javafaker:1.0.2') {
+        exclude group: 'org.yaml'
+    }
 }
 
 test {

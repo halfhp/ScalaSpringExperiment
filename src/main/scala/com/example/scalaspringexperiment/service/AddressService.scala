@@ -3,10 +3,12 @@ package com.example.scalaspringexperiment.service
 import cats.effect.{IO, Resource}
 import com.example.scalaspringexperiment.dao.{Dao, TableInfo}
 import com.example.scalaspringexperiment.entity.Address
+import com.example.scalaspringexperiment.util.PointUtils
 import doobie.{DataSourceTransactor, Fragment}
 import doobie.implicits.toSqlInterpolator
 import doobie.util.{Read, Write}
 import doobie.implicits.*
+import doobie.postgres.pgisimplicits.PointType
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 
@@ -27,6 +29,19 @@ class AddressService(
     sql"""
       SELECT * FROM $theTableName
       WHERE person_id = $personId
+    """.query[Address].to[Seq].transact(xa)
+  }
+
+  def findWithinDistance(
+    lat: Double,
+    lon: Double,
+    distanceInMeters: Float
+  ): IO[Seq[Address]] = ds.use { xa =>
+    val point = PointUtils.pointFromLatLon(lat = lat, lon = lon)
+    val theTableName = Fragment.const0(tableInfo.table.name)
+    sql"""
+      SELECT * FROM $theTableName
+      WHERE st_distancesphere(coordinates, $point) < $distanceInMeters
     """.query[Address].to[Seq].transact(xa)
   }
 }

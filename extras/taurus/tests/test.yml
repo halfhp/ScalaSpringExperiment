@@ -1,0 +1,38 @@
+#modules:
+#  jmeter:
+#    disable-plugins:
+#      - aggregate-report
+#      - view-results-tree
+#      - view-results-in-table
+#      - summary-report
+#    java-opts:
+#      - "-Djava.awt.headless=true"
+#      - "-XX:-TieredCompilation"
+#      - "-Xmx512m"
+
+execution:
+  - concurrency: 10
+    ramp-up: 30s
+    hold-for: 1m
+    scenario: simple
+
+scenarios:
+  simple:
+    requests:
+      - url: http://host.docker.internal:8080/
+        method: GET
+
+#settings:
+#  artifacts-dir: /output
+
+reporting:
+  - module: console
+  - module: final-stats
+    summary: true
+#  - module: junit-xml
+#    filename: /output/results.xml
+
+monitoring:
+  - module: local
+    cpu: true
+    memory: true
