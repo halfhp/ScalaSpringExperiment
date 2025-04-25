@@ -1,6 +1,7 @@
 package com.example.scalaspringexperiment.entity
 
 import com.example.scalaspringexperiment.dao.{Column, Table}
+import net.postgis.jdbc.geometry.Point
 
 import java.sql.Timestamp
 
@@ -19,11 +20,14 @@ case class Address(
   personId: Long,
 
   @Column("street")
-  street: Option[String],
+  street: Option[String] = None,
 
   @Column("city")
-  city: Option[String],
+  city: Option[String] = None,
 
   @Column("state")
-  state: Option[String]
+  state: Option[String] = None,
+
+  @Column("coordinates")
+  coordinates: Option[Point] = None,
 ) extends DomainEntity

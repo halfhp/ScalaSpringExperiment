@@ -1,3 +1,5 @@
+create extension if not exists "postgis";
+
 CREATE OR REPLACE FUNCTION set_timestamp_fields()
     RETURNS TRIGGER AS $$
 BEGIN
@@ -28,13 +30,14 @@ CREATE TABLE address (
     id BIGSERIAL PRIMARY KEY,
     date_created timestamp not null,
     last_updated timestamp not null,
-    person_id BIGINT not null         
+    person_id BIGINT not null
         constraint external_association_user_id_fk
         references person
         on delete cascade,
     street varchar,
     city varchar,
-    state varchar
+    state varchar,
+    coordinates geometry
 );
 
 CREATE TRIGGER set_address_timestamps
