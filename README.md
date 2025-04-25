@@ -81,16 +81,18 @@ This means that whenever you are working with variables coming Spring, you gener
 One particular place to watch out for this is when using Spring's `@RequestParam` and `@PathVariable` annotations in controllers.
 
 ## Spring's ThreadLocal Context
-Much of Spring's async programming model relies on ThreadLocal context.  This used to be a common pattern in Java, but not one that is used in Scala.
+Much of Spring's async programming model relies on ThreadLocal context, particularly when using WebMVC.  This used to be a common pattern in Java, but not one that is used in Scala.
 This becomes particularly annoying when interfacing between things like controller entry points and services and utilities that are built
 around IO/Future/ZIO etc. monads.  Effectively, trying to access something like Spring Security's SecurityContext from these methods
-will not work.  The best solution I have found is to pass the SecurityContext and any other ThreadLocal context as an argument to
+will not work.  Without going into too much detail WebFlux has the same basic problem, even though its not technically using ThreadLocal context.
+
+The best solution I have found is to pass the SecurityContext and any other ThreadLocal / pseudo global context data as an argument to
 these methods.  This is not ideal, but it is the best solution I have found so far.
 
 ## Async Programming 
 Spring has it's own mechanisms for async programming, and it takes some work to adapt it to be compatible with IO monads.
-Even after adapting these mechanisms we are left with having to manage an additional threadpool to accommodate Spring.
-The other challenge here is adapting the handling of uncaught exceptions so that Spring's conventional mechanisms will 
+Even after adapting these mechanisms we are left with having to manage an additional threadpool(s) to accommodate Spring.
+Another challenge here is adapting the handling of uncaught exceptions so that Spring's conventional mechanisms will 
 continue to function.
 
 ### Async Controllers
