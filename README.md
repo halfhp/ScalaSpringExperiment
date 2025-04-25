@@ -97,7 +97,7 @@ continue to function.
 The original version of this project used WebMVC which is built on top of Apache Tomcat and has its own async programming model.
 I've since switched to using WebFlux which is built on top of Netty and is generally considered to be more performant, particularly
 when it comes to servicing large numbers of requests concurrently.  I would not be surprised if this changes in the future
-thanks to the work being done on Project Loom.  For those interested in exploring this further, check out the webmvc tag
+thanks to the work being done on Project Loom.  For those interested in exploring this further, check out the [webmvc tag](https://github.com/halfhp/ScalaSpringExperiment/releases/tag/webmvc)
 of this repository.
 
 ### Async Database Drivers
