@@ -1,6 +1,6 @@
 package com.example.scalaspringexperiment.controller
 
-import com.example.scalaspringexperiment.service.{AddressService, PersonService}
+import com.example.scalaspringexperiment.service.{AddressService, BenchmarkService, PersonService}
 import cats.effect.IO
 import cats.effect.unsafe.implicits.global
 import com.example.scalaspringexperiment.entity.Person
@@ -24,7 +24,8 @@ import scala.util.chaining.*
 @RestController
 class SimpleController(
   personService: PersonService,
-  addressService: AddressService
+  addressService: AddressService,
+  benchmarkService: BenchmarkService
 ) {
 
   private implicit def ioToMono[A](io: IO[A]): Mono[A] = {
@@ -72,4 +73,47 @@ class SimpleController(
       case None => ResponseEntity.notFound().build()
     }
   }
+
+  /**
+   * An endpoint to help with load testing; performs configurable cpu-intensive work
+   * that can be invoked via a load testing tool like JMeter.
+   *
+   * @param count
+   * @param durationMs
+   * @param parallelism
+   * @return
+   */
+  @PreAuthorize("permitAll()")
+  @GetMapping(path = Array("/benchmark"))
+  def benchmark(
+    @RequestParam(defaultValue = "1") count: Int,
+    @RequestParam(defaultValue = "10") durationMs: Long,
+    @RequestParam(defaultValue = "1") parallelism: Int
+  ): Mono[ResponseEntity[Json]] = {
+    parallelism match {
+      case 1 =>
+        benchmarkService.doCpuIntensiveThingsSerially(
+          count = count,
+          individualDurationMs = durationMs
+        ).map { result =>
+          ResponseEntity.ok(Json.obj(
+            "result" -> result.asJson
+          ))
+        }
+      case n if n > 1 =>
+        benchmarkService.doCpuIntensiveThingsInParallel(
+          count = count,
+          individualDurationMs = durationMs,
+          parallelism = n
+        ).map { result =>
+          ResponseEntity.ok(Json.obj(
+            "result" -> result.asJson
+          ))
+        }
+      case _ =>
+        IO(ResponseEntity.badRequest().body(Json.obj("error" -> Json.fromString("Invalid mode"))))
+    }
+  }
+
+
 }

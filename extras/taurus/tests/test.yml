@@ -11,16 +11,53 @@
 #      - "-Xmx512m"
 
 execution:
+  - concurrency: 1
+    name: "serial conc=1, 10ms, 1x80"
+    scenario: serial_10ms_1x80
+    ramp-up: 1s
+    hold-for: 30s
+    sequential: true
+  - concurrency: 1
+    name: "parallel conc=1, 10ms, 4x80"
+    scenario: parallel_10ms_4x80
+    ramp-up: 1s
+    hold-for: 30s
+    sequential: true
   - concurrency: 10
-    ramp-up: 30s
-    hold-for: 1m
-    scenario: simple
+    name: "serial conc=10, 10ms, 1x80"
+    scenario: serial_10ms_1x80
+    ramp-up: 1s
+    hold-for: 30s
+    sequential: true
+  - concurrency: 10
+    name: "parallel conc=10, 10ms, 4x80"
+    scenario: parallel_10ms_4x80
+    ramp-up: 1s
+    hold-for: 30s
+    sequential: true
+  - concurrency: 100
+    name: "serial conc=100, 10ms, 1x80"
+    scenario: serial_10ms_1x80
+    ramp-up: 1s
+    hold-for: 30s
+    sequential: true
+  - concurrency: 100
+    name: "parallel conc=100, 10ms, 4x80"
+    scenario: parallel_10ms_4x80
+    ramp-up: 5s
+    hold-for: 30s
+    sequential: true
 
 scenarios:
-  simple:
+  serial_10ms_1x80:
     requests:
-      - url: http://host.docker.internal:8080/
+      - url: http://host.docker.internal:8080/benchmark?count=80&durationMs=10&parallelism=1
         method: GET
+  parallel_10ms_4x80:
+    requests:
+      - url: http://host.docker.internal:8080/benchmark?count=80&durationMs=10&parallelism=4
+        method: GET
+
 
 #settings:
 #  artifacts-dir: /output
