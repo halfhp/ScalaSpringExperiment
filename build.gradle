@@ -30,6 +30,8 @@ dependencies {
     implementation 'org.springframework.security:spring-security-test'
     implementation 'org.springframework.boot:spring-boot-starter-jdbc'
 
+    implementation 'com.github.jwt-scala:jwt-circe_3:10.0.4'
+
     implementation 'net.postgis:postgis-jdbc:2024.1.0'
 
     implementation 'io.circe:circe-core_3:0.14.12'

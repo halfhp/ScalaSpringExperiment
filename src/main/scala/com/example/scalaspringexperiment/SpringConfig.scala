@@ -2,6 +2,7 @@ package com.example.scalaspringexperiment
 
 import cats.effect.unsafe.IORuntime
 import cats.effect.{IO, Resource}
+import com.example.scalaspringexperiment.auth.JwtAuthManager
 import com.example.scalaspringexperiment.util.{CirceJsonDecoder, CirceJsonEncoder}
 import doobie.{DataSourceTransactor, ExecutionContexts}
 import doobie.util.transactor.Transactor
@@ -22,12 +23,8 @@ import javax.sql.DataSource
 @EnableReactiveMethodSecurity
 class SpringConfig(
   dataSource: DataSource,
+  jwtAuthManager: JwtAuthManager,
 ) {
-
-  @Bean
-  def catsEffectIORuntime(): IORuntime = {
-    cats.effect.unsafe.implicits.global
-  }
 
   @Bean
   def doobieTransactor(): Resource[IO, DataSourceTransactor[IO]] = {
@@ -40,14 +37,22 @@ class SpringConfig(
   def securityFilterChain(http: ServerHttpSecurity): SecurityWebFilterChain = {
     http
       .cors(Customizer.withDefaults())
-      .csrf(csrf => csrf.disable()) // Stateless app using JWT
+      .csrf(csrf => csrf.disable())
       .securityContextRepository(NoOpServerSecurityContextRepository.getInstance()) // optional, disables session caching
       .authorizeExchange(authz =>
         authz.anyExchange().permitAll()
       )
-//      .httpBasic().disable() // or leave enabled if using basic auth
-//      .formLogin().disable()
+      .authenticationManager(jwtAuthManager)
       .build()
+  }
+}
+
+@Configuration(proxyBeanMethods = false)
+class CatsEffectConfig {
+
+  @Bean
+  def catsEffectIORuntime(): IORuntime = {
+    cats.effect.unsafe.implicits.global
   }
 }
 

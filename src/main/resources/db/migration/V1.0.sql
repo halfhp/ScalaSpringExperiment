@@ -44,3 +44,22 @@ CREATE TRIGGER set_address_timestamps
     BEFORE INSERT OR UPDATE ON address
     FOR EACH ROW
 EXECUTE FUNCTION set_timestamp_fields();
+
+CREATE TABLE registered_user (
+    id BIGSERIAL PRIMARY KEY,
+    date_created timestamp not null,
+    last_updated timestamp not null,
+    email varchar unique not null,
+    email_verified boolean not null,
+    roles varchar[] not null,
+    password_hash varchar not null,
+    person_id BIGINT not null
+        constraint registered_user_person_id_fk
+        references person
+        on delete cascade
+);
+
+CREATE TRIGGER set_registered_user_timestamps
+    BEFORE INSERT OR UPDATE ON registered_user
+    FOR EACH ROW
+EXECUTE FUNCTION set_timestamp_fields();
