@@ -1,5 +1,7 @@
 [![build](https://github.com/halfhp/ScalaSpringExperiment/actions/workflows/build.yml/badge.svg)](https://github.com/halfhp/ScalaSpringExperiment/actions/workflows/build.yml)
 [![Codix](https://codix.io/gh/badge/halfhp/ScalaSpringExperiment)](https://codix.io/gh/repo/halfhp/ScalaSpringExperiment)
+
+:speech_balloon: **Questions / comments / suggestions are welcome in the [discussions](https://github.com/halfhp/ScalaSpringExperiment/discussions), or feel free to [contact me](mailto:halfhp@gmail.com) directly.**
 # Overview
 Demonstrates using Spring Framework with Scala 3.  
 
@@ -12,8 +14,6 @@ it has of Scala projects and libraries. Builds sometimes slow to a crawl, hang, 
 
 The jury is still out on whether the migration is worthwhile for established projects, but I do feel that Scala 3 has reached the point
 where it is the better choice for new projects.
-
-:speech_balloon: **Questions / comments / suggestions are welcome in the [discussions](https://github.com/halfhp/ScalaSpringExperiment/discussions), or feel free to [contact me](mailto:halfhp@gmail.com) directly.**
 
 # How to Run
 For convenience this project includes a [docker-compose environment](docker-compose.yml) that provisions a postgres database and configures
@@ -136,10 +136,6 @@ what happens under load in situations where there are fewer cores than threads, 
 * Add OAuth2 request/ refresh tokens
 * Add Oauth2 client to support third party authentication (Google, etc)
 * Add JTI to JWT tokens to support revocation
-
-## Async Rest Controller
-Create an AsyncController that demonstrates adapting Spring's async programming model
-to work effectively with Cats Effect IO's.
 
 
 
