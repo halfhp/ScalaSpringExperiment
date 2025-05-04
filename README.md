@@ -1,9 +1,13 @@
 [![build](https://github.com/halfhp/ScalaSpringExperiment/actions/workflows/build.yml/badge.svg)](https://github.com/halfhp/ScalaSpringExperiment/actions/workflows/build.yml)
 [![Codix](https://codix.io/gh/badge/halfhp/ScalaSpringExperiment)](https://codix.io/gh/repo/halfhp/ScalaSpringExperiment)
 # Overview
-Demonstrates using Spring Framework with Scala 3.
+Demonstrates using Spring Framework with Scala 3.  
 
-The biggest headaches of upgrading from Scala 2.13 to Scala 3 has been with the level of compatibility tools like IntellIJ offer, and the relatively small market share
+This codebase attempts to provide a sample project that includes
+working implementations of the most commonly used elements in a performant modern REST API (authn/authz, JWT, async programming, 
+unit & integration tests, etc.) while remaining as simple and easy to understand as possible.
+
+The biggest headaches of moving from Scala 2.x to Scala 3 have been with the level of compatibility tools like IntellIJ offer, and the relatively small market share
 it has of Scala projects and libraries. Builds sometimes slow to a crawl, hang, or randomly fail, only to succeed after a second or third retry.
 
 The jury is still out on whether the migration is worthwhile for established projects, but I do feel that Scala 3 has reached the point
@@ -38,11 +42,11 @@ preferred tool for structured concurrency.  2) Doobie is oriented around writing
 
 # Challenges & Annoyances
 As far as getting Spring and Scala to play nicely together, the challenges are fairly minor and can either be resolved
-once in your codebase and forgotten about, or are things that are a just take some getting used to.
+once in your codebase and forgotten about, or are things that just take time getting used to.
 
-Probably the most important one to be aware of here relates to async programming.  If you plan to use any form of Scala flavored structured concurrency,
-whether it be Futures, Cats Effect, ZIO, or something else, you are going to need to adapt the Spring async programming model to work with it or 
-performance will suffer severely.
+The big one one to be aware of here relates to async programming.  If you plan to use any form of Scala flavored structured concurrency,
+whether it be Futures, Cats Effect, ZIO, or something else, you need to adapt the Spring async programming model to work with it or 
+performance will suffer.
 
 ## Java -> Scala Interop
 Since we're using Scala and Spring is written in Java, we have to handle some idiosyncrasies.  These are a few of the most
@@ -71,7 +75,7 @@ as importing the necessary converter and using it.  [More info available here](h
 As of this writing and so far as I am aware, Spring still uses null instead of [Java 8's Optional monad](https://docs.oracle.com/javase/8/docs/api/java/util/Optional.html).
 This means that whenever you are working with variables coming Spring, you generally want to wrap them in a Scala Option.
 
-One particular place to watch out for this is when using Spring's `@RequestParam` and `@PathVariable` annotations in controllers.
+Watch out for this when using Spring's `@RequestParam` and `@PathVariable` annotations in controllers.
 
 ## Spring's ThreadLocal Context
 Parts of Spring's architecture relies on ThreadLocal context, particularly when using WebMVC.
