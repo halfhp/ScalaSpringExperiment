@@ -100,9 +100,35 @@ by the same author and offers similar functionality.  It's fully asynchronous bu
 Another option would be to use one Spring's database facilities that supports R2DBC, which is also async.  I've not tried this approach
 yet but imagine it could be wrapped with cats-effect IO similarly to what was done with [Mono] in the controller layer.
 
+# Issues
+## IO[T] to Mono[T] Conversion
+Right now this conversion is done in the controller layer like this:
+```scala
+private given ioToMono[A](): Conversion[IO[A], Mono[A]] with {
+    def apply(io: IO[A]): Mono[A] = {
+        Mono.fromFuture(new CompletableFuture[A]().tap { cf =>
+            io.unsafeRunAsync {
+              case Right(value) => cf.complete(value)
+              case Left(error) => cf.completeExceptionally(error)
+            }
+        })
+    }
+}
+```
+There may be performance issues going between the WebFlux and Cats Effect threadpools, particularly when
+running in an environment with a small number of CPU cores.  This has to do with how time sharing is handled with fibers / virtual threads;
+in Cats Effect, a fiber generally [only yields on an IO boundary](https://typelevel.org/cats-effect/docs/2.x/datatypes/io), or in other words, when one of it's composite IO blocks completes.
+This is fundamentally different from true threads where the OS scheduler ensures each thread gets a fair amount of CPU time regardless of
+where / what each thread is doing.
+
+Ideally there is at least one CPU core dedicated to each thread in each pool, but I am not sure how thread affinity works here
+or if it is even possible to exclusively bind a CPU to each of these threads.  I also plan to provide better detail on
+what happens under load in situations where there are fewer cores than threads, or even a single core.
+
 # Future Improvements
 ## Spring Security
-In particular, add JTW authentication and secured endpoints + tests
+* Add OAuth2 request/ refresh tokens
+* Add Oauth2 client to support third party authentication (Google, etc)
 
 ## Async Rest Controller
 Create an AsyncController that demonstrates adapting Spring's async programming model
