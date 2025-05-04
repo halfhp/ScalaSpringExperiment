@@ -3,7 +3,7 @@ package com.example.scalaspringexperiment.controller
 import cats.effect.IO
 import cats.effect.unsafe.IORuntime
 import org.springframework.security.core.Authentication
-import org.springframework.security.core.context.SecurityContextHolder
+import org.springframework.security.core.context.{ReactiveSecurityContextHolder, SecurityContext, SecurityContextHolder}
 import org.springframework.stereotype.Component
 import reactor.core.publisher.Mono
 
@@ -21,9 +21,9 @@ case class AuthCtx(
 class ControllerHelper(
   runtime: IORuntime
 ) {
-  
+
   given rt: IORuntime = runtime
-  
+
   private given ioToMono[A](): Conversion[IO[A], Mono[A]] with {
     def apply(io: IO[A]): Mono[A] = {
       Mono.fromFuture(new CompletableFuture[A]().tap { cf =>
@@ -41,13 +41,16 @@ class ControllerHelper(
 
   def maybeAuth[T](
     cb: Ctx => IO[T]
-  ): Mono[T] = cb(Ctx(
-    authentication = Option(SecurityContextHolder.getContext.getAuthentication
-    )))
+  ): Mono[T] = {
+    ReactiveSecurityContextHolder.getContext
+      .map(sc => Option(sc.getAuthentication))
+      .defaultIfEmpty(None)
+      .flatMap(auth => cb(Ctx(auth)))
+  }
 
   def auth[T](
-    cb: AuthCtx => T
-  ): T = {
+    cb: AuthCtx => IO[T]
+  ): Mono[T] = {
     Option(AuthCtx(
       authentication = SecurityContextHolder.getContext.getAuthentication
     )) match {

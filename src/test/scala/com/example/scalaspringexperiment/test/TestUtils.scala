@@ -24,14 +24,15 @@ case class Table(name: String) extends StaticAnnotation
 
 object TestUtils {
   val responsePrinter: Consumer[EntityExchangeResult[Array[Byte]]] = r => {
-    import io.circe.parser.*
-    val body = new String(r.getResponseBody, java.nio.charset.StandardCharsets.UTF_8)
-    parse(body) match {
-      case Left(error) =>
-        println(body)
-      case Right(json) =>
-        val prettyJson = json.spaces2
-        println(prettyJson)
+    Option(r.getResponseBody).map { body =>
+      import io.circe.parser.*
+      parse(new String(body, java.nio.charset.StandardCharsets.UTF_8)) match {
+        case Left(error) =>
+          println(body)
+        case Right(json) =>
+          val prettyJson = json.spaces2
+          println(prettyJson)
+      }
     }
   }
 }
@@ -47,7 +48,7 @@ class TestUtils(
 
   @Autowired
   var registeredUserService: RegisteredUserService = uninitialized
-  
+
   @Autowired
   var jwtAuthManager: JwtAuthManager = uninitialized
 
@@ -102,7 +103,7 @@ class TestUtils(
       }
     } yield finalizedPerson).unsafeRunSync()
   }
-  
+
   def newRegisteredUser(
     name: String = faker.name().fullName(),
     age: Int = faker.number().numberBetween(18, 79),

@@ -11,10 +11,8 @@ import javax.sql.DataSource
 @Profile(Array("test"))
 class SpringTestConfig(
   dataSource: DataSource,
-  jwtAuthManager: JwtAuthManager,
 ) extends SpringConfig(
   dataSource,
-  jwtAuthManager
 ) {
 
   // something that exists in prod that we dont want initializing in our tests

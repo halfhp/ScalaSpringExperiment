@@ -119,4 +119,62 @@ class AuthControllerTest {
       .expectBody()
       .consumeWith(TestUtils.responsePrinter)
   }
+
+  @Test
+  def maybeAuth_showsAuthenticated_forAuthenticatedRequest(): Unit = {
+    val (_, _, token) = testUtils.newRegisteredUser()
+    webTestClient.get()
+      .uri("/authtest/optional")
+      .header("Authorization", s"Bearer $token")
+      .exchange()
+      .expectStatus().isOk
+      .expectBody()
+      .consumeWith(TestUtils.responsePrinter)
+      .jsonPath("$.isAuthenticated").isEqualTo(true)
+  }
+
+  @Test
+  def maybeAuth_showsUnauthenticated_forUnauthenticatedRequest(): Unit = {
+    webTestClient.get()
+      .uri("/authtest/optional")
+      .exchange()
+      .expectStatus().isOk
+      .expectBody()
+      .consumeWith(TestUtils.responsePrinter)
+      .jsonPath("$.isAuthenticated").isEqualTo(false)
+  }
+
+  @Test
+  def requiredAuth_returnsUnauthorized_forUnauthenticatedRequest(): Unit = {
+    webTestClient.get()
+      .uri("/authtest/required")
+      .exchange()
+      .expectStatus().isUnauthorized
+      .expectBody()
+      .consumeWith(TestUtils.responsePrinter)
+  }
+
+  @Test
+  def userAuthTest_returnsOk_forAuthenticatedUserRequest(): Unit = {
+    val (_, _, token) = testUtils.newRegisteredUser()
+    webTestClient.get()
+      .uri("/authtest/user")
+      .header("Authorization", s"Bearer $token")
+      .exchange()
+      .expectStatus().isOk
+      .expectBody()
+      .consumeWith(TestUtils.responsePrinter)
+  }
+
+  @Test
+  def adminAuthTest_returnsForbidden_forAuthenticatedNonAdminRequest(): Unit = {
+    val (_, _, token) = testUtils.newRegisteredUser()
+    webTestClient.get()
+      .uri("/authtest/admin")
+      .header("Authorization", s"Bearer $token")
+      .exchange()
+      .expectStatus().isEqualTo(403)
+      .expectBody()
+      .consumeWith(TestUtils.responsePrinter)
+  }
 }

@@ -90,15 +90,26 @@ class AuthController(
   @PreAuthorize("permitAll()")
   @GetMapping(path = Array("authtest/optional"))
   def maybeAuthTest(): Mono[ResponseEntity[Json]] = helper.maybeAuth { ctx =>
-    ctx.authentication match {
-      case Some(auth) =>
-        IO(ResponseEntity.ok(Json.obj(
-          "message" -> Json.fromString("Signed in"),
-        )))
-      case None =>
-        IO(ResponseEntity.ok(Json.obj(
-          "message" -> Json.fromString("Not signed in"),
-        )))
-    }
+    IO(ResponseEntity.ok(Json.obj(
+      "isAuthenticated" -> ctx.authentication.isDefined.asJson,
+    )))
+  }
+
+  @PreAuthorize("isAuthenticated()")
+  @GetMapping(path = Array("authtest/required"))
+  def requiredAuthTest(): Mono[ResponseEntity[Json]] = helper.auth { ctx =>
+    IO(ResponseEntity.ok(Json.obj()))
+  }
+
+  @PreAuthorize("hasRole('ROLE_USER')")
+  @GetMapping(path = Array("authtest/user"))
+  def userAuthTest(): Mono[ResponseEntity[Json]] = helper.auth { ctx =>
+    IO(ResponseEntity.ok(Json.obj()))
+  }
+
+  @PreAuthorize("hasRole('ROLE_ADMIN')")
+  @GetMapping(path = Array("authtest/admin"))
+  def adminAuthTest(): Mono[ResponseEntity[Json]] = helper.auth { ctx =>
+    IO(ResponseEntity.ok(Json.obj()))
   }
 }

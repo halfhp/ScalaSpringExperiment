@@ -3,11 +3,12 @@ package com.example.scalaspringexperiment.auth
 import cats.data.EitherT
 import cats.effect.IO
 import cats.effect.unsafe.IORuntime
-import com.example.scalaspringexperiment.auth.JwtAuthManager.{AuthError, InvalidCredentials, LoginSuccess, RegisterSuccess, UserExists, UserNotFound}
+import com.example.scalaspringexperiment.auth.JwtAuthManager.{AuthError, InvalidCredentials, LoginSuccess, ROLE_USER, RegisterSuccess, UserExists, UserNotFound}
 import com.example.scalaspringexperiment.entity.{Person, RegisteredUser}
 import com.example.scalaspringexperiment.service.{PersonService, RegisteredUserService}
 import org.springframework.context.annotation.Lazy
 import org.springframework.security.authentication.{ReactiveAuthenticationManager, UsernamePasswordAuthenticationToken}
+import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.{Authentication, GrantedAuthority}
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.stereotype.Component
@@ -19,6 +20,8 @@ import java.time.Instant
 import scala.jdk.CollectionConverters.*
 
 object JwtAuthManager {
+  val ROLE_USER = "ROLE_USER"
+  val ROLE_ADMIN = "ROLE_ADMIN"
   sealed trait AuthError {
     val message: String
   }
@@ -63,17 +66,23 @@ class JwtAuthManager(
   private val secretKey: String = "secretKey"
   private val algo = JwtAlgorithm.HS256
 
-  override def authenticate(
-    authentication: Authentication
-  ): Mono[Authentication] = {
+  override def authenticate(authentication: Authentication): Mono[Authentication] = {
+    println(s"[AUTH DEBUG] Called with credentials: ${authentication.getCredentials}")
     try {
       val token = authentication.getCredentials.toString
       val claim = JwtCirce.decode(token, secretKey, Seq(algo)).get
-      Mono.just(new UsernamePasswordAuthenticationToken(claim.subject.get, null, Seq[GrantedAuthority]().asJava))
+      val authorities = Seq(new SimpleGrantedAuthority(ROLE_USER))
+      val auth = new UsernamePasswordAuthenticationToken(
+        claim.subject.get,
+        null,
+        authorities.asJava
+      )
+      Mono.just(auth)
     } catch {
       case e: Exception => Mono.empty()
     }
   }
+
 
   def generateTokenForRegisteredUser(
     user: RegisteredUser,
