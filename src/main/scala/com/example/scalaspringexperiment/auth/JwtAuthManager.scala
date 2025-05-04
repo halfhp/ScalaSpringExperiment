@@ -3,13 +3,14 @@ package com.example.scalaspringexperiment.auth
 import cats.data.EitherT
 import cats.effect.IO
 import cats.effect.unsafe.IORuntime
-import com.example.scalaspringexperiment.auth.JwtAuthManager.{AuthError, InvalidCredentials, LoginSuccess, ROLE_USER, RegisterSuccess, UserExists, UserNotFound}
+import com.example.scalaspringexperiment.auth.JwtAuthManager.{AuthError, DEFAULT_TOKEN_LIFETIME_SECONDS, InvalidCredentials, LoginSuccess, ROLE_USER, RegisterSuccess, UserExists, UserNotFound}
 import com.example.scalaspringexperiment.entity.{Person, RegisteredUser}
 import com.example.scalaspringexperiment.service.{PersonService, RegisteredUserService}
+import com.example.scalaspringexperiment.util.AsyncUtils
 import org.springframework.context.annotation.Lazy
 import org.springframework.security.authentication.{ReactiveAuthenticationManager, UsernamePasswordAuthenticationToken}
 import org.springframework.security.core.authority.SimpleGrantedAuthority
-import org.springframework.security.core.{Authentication, GrantedAuthority}
+import org.springframework.security.core.Authentication
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.stereotype.Component
 import pdi.jwt.{JwtAlgorithm, JwtCirce, JwtClaim}
@@ -20,8 +21,11 @@ import java.time.Instant
 import scala.jdk.CollectionConverters.*
 
 object JwtAuthManager {
-  val ROLE_USER = "ROLE_USER"
-  val ROLE_ADMIN = "ROLE_ADMIN"
+
+  val ROLE_USER: String = "ROLE_USER"
+  val ROLE_ADMIN: String = "ROLE_ADMIN"
+  val DEFAULT_TOKEN_LIFETIME_SECONDS: Int = 3600 * 24 * 30 // 30 days
+
   sealed trait AuthError {
     val message: String
   }
@@ -62,27 +66,27 @@ class JwtAuthManager(
 
   given theRuntime: IORuntime = runtime
 
+  import AsyncUtils.ioToMono
+
   // TODO: this is very bad:
   private val secretKey: String = "secretKey"
   private val algo = JwtAlgorithm.HS256
 
-  override def authenticate(authentication: Authentication): Mono[Authentication] = {
-    println(s"[AUTH DEBUG] Called with credentials: ${authentication.getCredentials}")
-    try {
-      val token = authentication.getCredentials.toString
-      val claim = JwtCirce.decode(token, secretKey, Seq(algo)).get
-      val authorities = Seq(new SimpleGrantedAuthority(ROLE_USER))
-      val auth = new UsernamePasswordAuthenticationToken(
+  override def authenticate(
+    authentication: Authentication
+  ): Mono[Authentication] = {
+    for {
+      token <- IO(authentication.getCredentials.toString)
+      claim <- IO(JwtCirce.decode(token, secretKey, Seq(algo)).get)
+      user <- registeredUserService.findById(claim.subject.map(_.toLong).getOrElse(???))
+      authorities <- IO(user.getOrElse(???).roles.map(role => new SimpleGrantedAuthority(role)))
+      auth <- IO(new UsernamePasswordAuthenticationToken(
         claim.subject.get,
         null,
         authorities.asJava
-      )
-      Mono.just(auth)
-    } catch {
-      case e: Exception => Mono.empty()
-    }
+      ))
+    } yield auth
   }
-
 
   def generateTokenForRegisteredUser(
     user: RegisteredUser,
@@ -124,7 +128,10 @@ class JwtAuthManager(
         case Some(p) => Right(p)
         case None => Left(UserNotFound("Person not found"))
       })
-      jwtToken <- EitherT.liftF[IO, AuthError, String](generateTokenForRegisteredUser(registeredUser, Instant.now.plusSeconds(3600 * 30)))
+      jwtToken <- EitherT.liftF[IO, AuthError, String](generateTokenForRegisteredUser(
+        user = registeredUser,
+        expiration = Instant.now.plusSeconds(DEFAULT_TOKEN_LIFETIME_SECONDS)
+      ))
     } yield LoginSuccess(
         registeredUser = registeredUser,
         person = person,
@@ -152,7 +159,7 @@ class JwtAuthManager(
         email = email,
         passwordHash = passwordHash,
         personId = person.id,
-        roles = List() // TODO
+        roles = List(ROLE_USER) // TODO
       )))
       jwtToken <- EitherT.liftF(generateTokenForRegisteredUser(registeredUser, Instant.now.plusSeconds(3600 * 30))) // 30 days
     } yield RegisterSuccess(

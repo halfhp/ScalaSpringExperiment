@@ -4,10 +4,10 @@
 Demonstrates using Spring Framework with Scala 3.
 
 The biggest headaches of upgrading from Scala 2.13 to Scala 3 has been with the level of compatibility tools like IntellIJ offer, and the relatively small market share
-it has of Scala projects and libraries. Builds sometimes slow to a crawl or hang or randomly fail, only to succeed after a second or third retry.
+it has of Scala projects and libraries. Builds sometimes slow to a crawl, hang, or randomly fail, only to succeed after a second or third retry.
 
-The jury is still out on whether the migration is worthwhile for established projects, but
-as of 2025 I do feel like Scala 3 is the way to go for new projects.
+The jury is still out on whether the migration is worthwhile for established projects, but I do feel that Scala 3 has reached the point
+where it is the better choice for new projects.
 
 :speech_balloon: **Questions / comments / suggestions are welcome in the [discussions](https://github.com/halfhp/ScalaSpringExperiment/discussions), or feel free to [contact me](mailto:halfhp@gmail.com) directly.**
 
@@ -20,7 +20,8 @@ the app to use it.
 * Gradle[^1]
 * Spring Boot
 * Spring Security
-* Circe - JSON serialization and deserialization
+* [JWT Scala](https://github.com/jwt-scala/jwt-scala)
+* [Circe](https://github.com/circe/circe) - JSON serialization and deserialization
 * ~~ZIO~~ (Sticking with with Cats Effect out of preference, and because ZIO seems to have been [abandoned by its author](https://degoes.net/articles/splendid-scala-journey).)
 * Cats Effect
 * [Doobie](https://github.com/typelevel/doobie)[^2]
@@ -28,8 +29,9 @@ the app to use it.
 * ScalaTest
 * Mockito
 
-[^1]: I chose Gradle over SBT initially out of curiosity.  At this point I've used for several Scala projects now and have no regrets.
-SBT I believe might have some minor performance benefits, but you really cant Gradle in terms of features and support.
+[^1]: I've used for several Scala projects now and have few regrets. SBT I believe might have some minor performance benefits, 
+but you really cant beat Gradle in terms of features and support.  Having said that, it is possible that some of the build
+instability / Intellij bugginess I am experiencing is due to Gradle.
 
 [^2]: So why Doobie and not one of the options that come packaged with Spring?  Two main reasons: 1) Integrates seemlessly with Cats Effect and the IO monad, which is my
 preferred tool for structured concurrency.  2) Doobie is oriented around writing pure SQL and producing results as immutable case classes which I prefer over ORM approaches etc. that involve things like Hibernate, JPA, "live objects", etc.
@@ -129,6 +131,7 @@ what happens under load in situations where there are fewer cores than threads, 
 ## Spring Security
 * Add OAuth2 request/ refresh tokens
 * Add Oauth2 client to support third party authentication (Google, etc)
+* Add JTI to JWT tokens to support revocation
 
 ## Async Rest Controller
 Create an AsyncController that demonstrates adapting Spring's async programming model
