@@ -3,20 +3,11 @@
 # Overview
 Demonstrates using Spring Framework with Scala 3.
 
-Since the initial release of Scala 3 I've considered upgrading various 
-non-trivial personal and professional projects from 2.13 to 3, but until recently (2025) always ultimately declined to upgrade.   
-
-After getting over the deprecation hurdles,
-The biggest headaches have been with the level of compatibility tools like IntellIJ offer, and the relatively small market share
-scala 3 currently has of Scala projects and libraries.
-Builds can also slow to a crawl or hang during non-trivial refactorings.  Compile times
-are also up, and builds will randomly fail, only to succeed after a second or third retry. 
+The biggest headaches of upgrading from Scala 2.13 to Scala 3 has been with the level of compatibility tools like IntellIJ offer, and the relatively small market share
+it has of Scala projects and libraries. Builds sometimes slow to a crawl or hang or randomly fail, only to succeed after a second or third retry.
 
 The jury is still out on whether the migration is worthwhile for established projects, but
-as of 2025 I do feel like Scala 3 is the way to go.
-
-I'll try to keep this project updated
-with things I learn as I go.
+as of 2025 I do feel like Scala 3 is the way to go for new projects.
 
 :speech_balloon: **Questions / comments / suggestions are welcome in the [discussions](https://github.com/halfhp/ScalaSpringExperiment/discussions), or feel free to [contact me](mailto:halfhp@gmail.com) directly.**
 
@@ -81,13 +72,13 @@ This means that whenever you are working with variables coming Spring, you gener
 One particular place to watch out for this is when using Spring's `@RequestParam` and `@PathVariable` annotations in controllers.
 
 ## Spring's ThreadLocal Context
-Much of Spring's async programming model relies on ThreadLocal context, particularly when using WebMVC.  This used to be a common pattern in Java, but not one that is used in Scala.
-This becomes particularly annoying when interfacing between things like controller entry points and services and utilities that are built
+Parts of Spring's architecture relies on ThreadLocal context, particularly when using WebMVC.
+This can be problematic when interfacing between things like controller entry points and services and utilities that are built
 around IO/Future/ZIO etc. monads.  Effectively, trying to access something like Spring Security's SecurityContext from these methods
 will not work.  Without going into too much detail WebFlux has the same basic problem, even though its not technically using ThreadLocal context.
 
-The best solution I have found is to pass the SecurityContext and any other ThreadLocal / pseudo global context data as an argument to
-these methods.  This is not ideal, but it is the best solution I have found so far.
+My preferred solution is to pass the SecurityContext and any other ThreadLocal / pseudo global context data as an argument to
+these methods.
 
 ## Async Programming 
 Spring has it's own mechanisms for async programming, and it takes some work to adapt it to be compatible with IO monads.

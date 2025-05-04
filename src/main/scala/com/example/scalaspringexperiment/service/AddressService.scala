@@ -22,10 +22,11 @@ class AddressService(
   override implicit val reader: Read[Address] = Read.derived
   override implicit val writer: Write[Address] = Write.derived
 
+  private val theTableName = Fragment.const0(tableInfo.table.name)
+
   def findByPersonId(
     personId: Long
   ): IO[Seq[Address]] = ds.use { xa =>
-    val theTableName = Fragment.const0(tableInfo.table.name)
     sql"""
       SELECT * FROM $theTableName
       WHERE person_id = $personId
@@ -38,7 +39,6 @@ class AddressService(
     distanceInMeters: Float
   ): IO[Seq[Address]] = ds.use { xa =>
     val point = PointUtils.pointFromLatLon(lat = lat, lon = lon)
-    val theTableName = Fragment.const0(tableInfo.table.name)
     sql"""
       SELECT * FROM $theTableName
       WHERE st_distancesphere(coordinates, $point) < $distanceInMeters

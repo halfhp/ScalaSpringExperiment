@@ -2,32 +2,30 @@ package com.example.scalaspringexperiment
 
 import cats.effect.unsafe.IORuntime
 import cats.effect.{IO, Resource}
+import com.example.scalaspringexperiment.auth.{JwtAuthManager, JwtServerAuthConverter}
 import com.example.scalaspringexperiment.util.{CirceJsonDecoder, CirceJsonEncoder}
 import doobie.{DataSourceTransactor, ExecutionContexts}
 import doobie.util.transactor.Transactor
-import org.springframework.context.annotation.{Bean, Configuration}
+import org.springframework.context.annotation.{Bean, Configuration, Primary}
+import org.springframework.http.HttpStatus
 import org.springframework.http.codec.ServerCodecConfigurer
+import org.springframework.security.authentication.{DelegatingReactiveAuthenticationManager, UsernamePasswordAuthenticationToken}
 import org.springframework.security.config.Customizer
 import org.springframework.security.config.annotation.method.configuration.EnableReactiveMethodSecurity
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity
-import org.springframework.security.config.web.server.ServerHttpSecurity
+import org.springframework.security.config.web.server.{SecurityWebFiltersOrder, ServerHttpSecurity}
 import org.springframework.security.web.server.SecurityWebFilterChain
-import org.springframework.security.web.server.context.NoOpServerSecurityContextRepository
+import org.springframework.security.web.server.authentication.AuthenticationWebFilter
+import org.springframework.security.web.server.context.{NoOpServerSecurityContextRepository, WebSessionServerSecurityContextRepository}
 import org.springframework.web.reactive.config.WebFluxConfigurer
 
 import javax.sql.DataSource
 
+
 @Configuration
-@EnableWebFluxSecurity
-@EnableReactiveMethodSecurity
 class SpringConfig(
   dataSource: DataSource,
 ) {
-
-  @Bean
-  def catsEffectIORuntime(): IORuntime = {
-    cats.effect.unsafe.implicits.global
-  }
 
   @Bean
   def doobieTransactor(): Resource[IO, DataSourceTransactor[IO]] = {
@@ -35,19 +33,45 @@ class SpringConfig(
       ce <- ExecutionContexts.fixedThreadPool[IO](32) // our connect EC
     } yield Transactor.fromDataSource[IO](dataSource, ce)
   }
+}
 
+@Configuration
+@EnableWebFluxSecurity
+@EnableReactiveMethodSecurity
+class SecurityConfig(
+  jwtAuthManager: JwtAuthManager,
+) {
   @Bean
-  def securityFilterChain(http: ServerHttpSecurity): SecurityWebFilterChain = {
+  def securityFilterChain(
+    http: ServerHttpSecurity,
+    jwtAuthFilter: AuthenticationWebFilter,
+  ): SecurityWebFilterChain = {
     http
       .cors(Customizer.withDefaults())
-      .csrf(csrf => csrf.disable()) // Stateless app using JWT
-      .securityContextRepository(NoOpServerSecurityContextRepository.getInstance()) // optional, disables session caching
-      .authorizeExchange(authz =>
-        authz.anyExchange().permitAll()
-      )
-//      .httpBasic().disable() // or leave enabled if using basic auth
-//      .formLogin().disable()
+      .csrf(csrf => csrf.disable())
+      .authorizeExchange(_.anyExchange().permitAll())
+      .addFilterAt(jwtAuthFilter, SecurityWebFiltersOrder.AUTHENTICATION)
+      .securityContextRepository(NoOpServerSecurityContextRepository.getInstance()) // stateless auth
       .build()
+  }
+
+    @Bean
+    def jwtAuthFilter(
+      jwtAuthManager: JwtAuthManager
+    ): AuthenticationWebFilter = {
+      val filter = new AuthenticationWebFilter(jwtAuthManager)
+      filter.setServerAuthenticationConverter(new JwtServerAuthConverter)
+      filter.setSecurityContextRepository(NoOpServerSecurityContextRepository.getInstance())
+      filter
+    }
+}
+
+@Configuration(proxyBeanMethods = false)
+class CatsEffectConfig {
+
+  @Bean
+  def catsEffectIORuntime(): IORuntime = {
+    cats.effect.unsafe.implicits.global
   }
 }
 
