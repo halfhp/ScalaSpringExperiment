@@ -22,6 +22,8 @@ the app to use it.
 There is also a K6 benchmark jetpack-compose environment in `/extras` that is preconfigured to run against localhost:8080.
 See the [README](extras/k6/README.md) for more information.
 
+![K6 Benchmark Dashboard](./docs/k6-dashboard.png)
+
 # Libraries and Frameworks Used
 
 * Gradle[^1]
