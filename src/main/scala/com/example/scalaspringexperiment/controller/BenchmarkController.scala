@@ -22,6 +22,7 @@ class BenchmarkController(
    *
    * @param count
    * @param durationMs
+   * @param waitIntervalMs
    * @param parallelism
    * @return
    */
@@ -30,30 +31,18 @@ class BenchmarkController(
   def benchmark(
     @RequestParam(defaultValue = "1") count: Int,
     @RequestParam(defaultValue = "10") durationMs: Long,
+    @RequestParam(defaultValue = "0") waitIntervalMs: Long,
     @RequestParam(defaultValue = "1") parallelism: Int
   ): Mono[ResponseEntity[Json]] = helper.maybeAuth { _ =>
-    parallelism match {
-      case 1 =>
-        benchmarkService.doCpuIntensiveThingsSerially(
-          count = count,
-          individualDurationMs = durationMs
-        ).map { result =>
-          ResponseEntity.ok(Json.obj(
-            "result" -> result.asJson
-          ))
-        }
-      case n if n > 1 =>
-        benchmarkService.doCpuIntensiveThingsInParallel(
-          count = count,
-          individualDurationMs = durationMs,
-          parallelism = n
-        ).map { result =>
-          ResponseEntity.ok(Json.obj(
-            "result" -> result.asJson
-          ))
-        }
-      case _ =>
-        IO(ResponseEntity.badRequest().body(Json.obj("error" -> Json.fromString("Invalid mode"))))
+    benchmarkService.doCpuIntensiveThings(
+      iterations = count,
+      iterationDurationMs = durationMs,
+      waitIntervalMs = waitIntervalMs,
+      parallelism = parallelism
+    ).map { result =>
+      ResponseEntity.ok(Json.obj(
+        "result" -> result.asJson
+      ))
     }
   }
 }

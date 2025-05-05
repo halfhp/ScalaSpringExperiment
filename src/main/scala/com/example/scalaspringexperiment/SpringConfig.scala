@@ -83,7 +83,7 @@ class AsyncConfig {
    */
   @Bean
   def catsEffectIORuntime(): IORuntime = {
-//    cats.effect.unsafe.implicits.global // uncomment this for real-world use
+//    cats.effect.unsafe.implicits.global // use this version to set threadpool size to number of available processors
     val threadPool = Executors.newFixedThreadPool(2)
     val executionContext = ExecutionContext.fromExecutor(threadPool)
     val config = IORuntimeConfig()
@@ -93,7 +93,8 @@ class AsyncConfig {
   /**
    * More or less the same story here as with cats-effect above.  For real-world environments you can optionally remove this
    * bean completely.  Having said that, all this threadpool is used for is to accept requests and pass them
-   * off to the cats-effect threadpool to be processed.  A single thread can handle typical use cases.
+   * off to the cats-effect threadpool to be processed.  As long as no work that involves blocking IO is done on this threadpool
+   * a single thread should generally be sufficient.
    *
    * @return
    */
