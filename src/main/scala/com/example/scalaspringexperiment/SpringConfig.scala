@@ -1,25 +1,27 @@
 package com.example.scalaspringexperiment
 
-import cats.effect.unsafe.IORuntime
+import cats.effect.unsafe.{IORuntime, IORuntimeConfig}
 import cats.effect.{IO, Resource}
 import com.example.scalaspringexperiment.auth.{JwtAuthManager, JwtServerAuthConverter}
 import com.example.scalaspringexperiment.util.{CirceJsonDecoder, CirceJsonEncoder}
 import doobie.{DataSourceTransactor, ExecutionContexts}
 import doobie.util.transactor.Transactor
-import org.springframework.context.annotation.{Bean, Configuration, Primary}
-import org.springframework.http.HttpStatus
+import org.springframework.context.annotation.{Bean, Configuration}
+import org.springframework.http.client.ReactorResourceFactory
 import org.springframework.http.codec.ServerCodecConfigurer
-import org.springframework.security.authentication.{DelegatingReactiveAuthenticationManager, UsernamePasswordAuthenticationToken}
 import org.springframework.security.config.Customizer
 import org.springframework.security.config.annotation.method.configuration.EnableReactiveMethodSecurity
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity
 import org.springframework.security.config.web.server.{SecurityWebFiltersOrder, ServerHttpSecurity}
 import org.springframework.security.web.server.SecurityWebFilterChain
 import org.springframework.security.web.server.authentication.AuthenticationWebFilter
-import org.springframework.security.web.server.context.{NoOpServerSecurityContextRepository, WebSessionServerSecurityContextRepository}
+import org.springframework.security.web.server.context.NoOpServerSecurityContextRepository
 import org.springframework.web.reactive.config.WebFluxConfigurer
+import reactor.netty.resources.LoopResources
 
+import java.util.concurrent.Executors
 import javax.sql.DataSource
+import scala.concurrent.ExecutionContext
 
 
 @Configuration
@@ -55,23 +57,52 @@ class SecurityConfig(
       .build()
   }
 
-    @Bean
-    def jwtAuthFilter(
-      jwtAuthManager: JwtAuthManager
-    ): AuthenticationWebFilter = {
-      val filter = new AuthenticationWebFilter(jwtAuthManager)
-      filter.setServerAuthenticationConverter(new JwtServerAuthConverter)
-      filter.setSecurityContextRepository(NoOpServerSecurityContextRepository.getInstance())
-      filter
-    }
+  @Bean
+  def jwtAuthFilter(
+    jwtAuthManager: JwtAuthManager
+  ): AuthenticationWebFilter = {
+    val filter = new AuthenticationWebFilter(jwtAuthManager)
+    filter.setServerAuthenticationConverter(new JwtServerAuthConverter)
+    filter.setSecurityContextRepository(NoOpServerSecurityContextRepository.getInstance())
+    filter
+  }
 }
 
 @Configuration(proxyBeanMethods = false)
-class CatsEffectConfig {
+class AsyncConfig {
 
+  /**
+   * We limit our cats-effect threadpool to 2 here to correspond to a baseline use case of
+   * 2 cpu cores.  This is mainly useful for slightly more consistent benchmarking, though it doesn't
+   * control for variations in hardware, other running processes, etc.
+   *
+   * IMPORTANT: For real-world environments you probably want to just return cats.effect.unsafe.implicits.global
+   * which will set the threadpool size the number of available processors.
+   *
+   * @return
+   */
   @Bean
   def catsEffectIORuntime(): IORuntime = {
-    cats.effect.unsafe.implicits.global
+//    cats.effect.unsafe.implicits.global // uncomment this for real-world use
+    val threadPool = Executors.newFixedThreadPool(2)
+    val executionContext = ExecutionContext.fromExecutor(threadPool)
+    val config = IORuntimeConfig()
+    IORuntime(executionContext, executionContext, cats.effect.unsafe.IORuntime.global.scheduler, () => (), config)
+  }
+
+  /**
+   * More or less the same story here as with cats-effect above.  For real-world environments you can optionally remove this
+   * bean completely.  Having said that, all this threadpool is used for is to accept requests and pass them
+   * off to the cats-effect threadpool to be processed.  A single thread can handle typical use cases.
+   *
+   * @return
+   */
+  @Bean
+  def reactorResourceFactory(): ReactorResourceFactory = {
+    val factory = new ReactorResourceFactory()
+    factory.setUseGlobalResources(false)
+    factory.setLoopResources(LoopResources.create("netty", 1, true))
+    factory
   }
 }
 

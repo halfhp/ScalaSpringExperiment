@@ -19,6 +19,9 @@ where it is the better choice for new projects.
 For convenience this project includes a [docker-compose environment](docker-compose.yml) that provisions a postgres database and configures
 the app to use it.
 
+There is also a K6 benchmark jetpack-compose environment in `/extras` that is preconfigured to run against localhost:8080.
+See the [README](extras/k6/README.md) for more information.
+
 # Libraries and Frameworks Used
 
 * Gradle[^1]
