@@ -19,8 +19,8 @@ It's no secret that the design of Kotlin draws quite a bit of inspiration from S
 so there is some convergence happening.  Throw in a functional programming library like [Arrow](https://arrow-kt.io/) and you have a compelling alternative
 that plays a little better with Spring's Java codebase, has a lower learning curve and a larger pool of active developers.  
 The biggest gripe I have with Kotlin when it comes to backend systems has to do with database libraries.  
-There are many to choose from, but due to laguage limitations (last I checked) they do not offer the same combination of
-expressiveness, functionality, or type safety of something like Doobie. How big of a deal that really is depends on the project and the team.
+There are many to choose from, but due to laguage limitations (last I checked) do not offer the same combination of
+expressiveness, functionality, and type safety of something like Doobie. How big of a deal that really is depends on the project and the team.
 
 ## Why Scala3?
 The biggest headaches of moving from Scala 2.x to Scala 3 have been with the level of compatibility tools like IntellIJ offer, and the relatively small market share
