@@ -9,10 +9,24 @@ This codebase attempts to provide a sample project that includes
 working implementations of the most commonly used elements in a performant modern REST API (authn/authz, JWT, async programming, 
 unit & integration tests, etc.) while remaining as simple and easy to understand as possible.
 
+## Why Scala?
+There probably isn't a universally great answer.  Anyone checking out this codebase probably already has their own
+valid reasons for wanting to use Scala. I will say that while the learning curve may be high, assuming a team of strong developers,
+Scala is certainly one of if not the most productive JVM languages to exist.
+
+Everyone else interested in using Spring with something other than Java, consider using Kotlin instead.
+It's no secret that the design of Kotlin draws quite a bit of inspiration from Scala, and more recently, Scala3 has begun to take inspiration from Kotlin as well,
+so there is some convergence happening.  Throw in a functional programming library like [Arrow](https://arrow-kt.io/) and you have a compelling alternative
+that plays a little better with Spring's Java codebase, has a lower learning curve and a larger pool of active developers.  
+The biggest gripe I have with Kotlin when it comes to backend systems has to do with database libraries.  
+There are many to choose from, but due to laguage limitations (last I checked) they do not offer the same combination of
+expressiveness, functionality, or type safety of something like Doobie. How big of a deal that really is depends on the project and the team.
+
+## Why Scala3?
 The biggest headaches of moving from Scala 2.x to Scala 3 have been with the level of compatibility tools like IntellIJ offer, and the relatively small market share
 it has of Scala projects and libraries. Builds sometimes slow to a crawl, hang, or randomly fail, only to succeed after a second or third retry.
 
-The jury is still out on whether the migration is worthwhile for established projects, but I do feel that Scala 3 has reached the point
+The jury is still out on whether the migration is worthwhile for established projects, but I do feel that Scala3 has reached the point
 where it is the better choice for new projects.
 
 # How to Run
@@ -97,18 +111,27 @@ Even after adapting these mechanisms we are left with having to manage an additi
 Another challenge here is adapting the handling of uncaught exceptions so that Spring's conventional mechanisms will 
 continue to function.
 
+### Why not use Reactor?
+Anecdotally, I soured on RxJava quite some time ago due what I consider to be poor design.  The complete laundry list is out of scope
+but by way of a couple examples, no common base for reactive types, and the inability to emit null values. 
+
+While they share similar syntax, Reactor is not RxJava, and even fixes some of its mistakes.  From a developer productivity
+perspective I find many other tools to be more expressive, less "magical" and more extensible; 
+cats-effect, ZIO, and Kotlin coroutines with Flow (if you use Kotlin) 
+to name a few.
+
 ### Async Controllers
-The original version of this project used WebMVC which is built on top of Apache Tomcat and has its own async programming model.
-I've since switched to using WebFlux which is built on top of Netty and is generally considered to be more performant, particularly
-when it comes to servicing large numbers of requests concurrently.  I would not be surprised if this changes in the future
-thanks to the work being done on Project Loom.  For those interested in exploring this further, check out the [webmvc tag](https://github.com/halfhp/ScalaSpringExperiment/releases/tag/webmvc)
-of this repository.
+The original version of this project used WebMVC which is built on top of Apache Tomcat and has pseudo-async support.
+I've since switched to using WebFlux which uses Netty and is generally more performant, particularly when under heavy load.  
+I would not be surprised if this changes in the future thanks to the work being done on Project Loom.  
+For those interested in exploring this further, check out the old [webmvc tag](https://github.com/halfhp/ScalaSpringExperiment/releases/tag/webmvc)of this repository.
 
 ### Async Database Drivers
-This project uses Doobie, which is built on top of JDBC which is synchronous.  There is another library, Skunk, which is written
-by the same author and offers similar functionality.  It's fully asynchronous but also locks you into using Postgres.
+This project uses Doobie, which is built on top of JDBC which is synchronous but supports a wide variety SQL databases.  
+There is another library, Skunk, which is written by the same author and offers similar functionality.  
+It's fully asynchronous but locks you into Postgres.
 
-Another option would be to use one Spring's database facilities that supports R2DBC, which is also async.  I've not tried this approach
+Another option would be to use [R2DBC](https://spring.io/projects/spring-data-r2dbc) which is also async.  I've not tried this approach
 yet but imagine it could be wrapped with cats-effect IO similarly to what was done with [Mono] in the controller layer.
 
 # Issues
