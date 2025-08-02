@@ -17,7 +17,7 @@ services:
 
   sse_postgres:
     container_name: sse_postgres
-    image: postgres:15
+    image: postgis/postgis:15-3.3
     environment:
       POSTGRES_DB: postgres
       POSTGRES_USER: postgres
