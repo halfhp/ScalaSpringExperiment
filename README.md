@@ -14,7 +14,7 @@ There probably isn't a universally great answer.  Anyone checking out this codeb
 valid reasons for wanting to use Scala. I will say that while the learning curve may be high, assuming a team of strong developers,
 Scala is certainly one of if not the most productive JVM languages to exist.
 
-Everyone else interested in using Spring with something other than Java, consider using Kotlin instead.
+Everyone else interested in using Spring with something other than Java, [consider using Kotlin instead](https://docs.spring.io/spring-framework/reference/languages/kotlin.html).
 It's no secret that the design of Kotlin draws quite a bit of inspiration from Scala, and more recently, Scala3 has begun to take inspiration from Kotlin as well,
 so there is some convergence happening.  Throw in a functional programming library like [Arrow](https://arrow-kt.io/) and you have a compelling alternative
 that plays a little better with Spring's Java codebase, has a lower learning curve and a larger pool of active developers.  

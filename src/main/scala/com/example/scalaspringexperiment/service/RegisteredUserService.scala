@@ -17,7 +17,7 @@ class RegisteredUserService(
 ) extends Dao[RegisteredUser] {
 
   override val logger: Logger = LoggerFactory.getLogger(classOf[RegisteredUserService])
-  override val tableInfo: TableInfo[RegisteredUser] = TableInfo.build[RegisteredUser]()
+  override val tableInfo: TableInfo[RegisteredUser] = TableInfo.build()
   override implicit val reader: Read[RegisteredUser] = Read.derived
   override implicit val writer: Write[RegisteredUser] = Write.derived
 

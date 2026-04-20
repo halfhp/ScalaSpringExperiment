@@ -18,7 +18,7 @@ class AddressService(
 ) extends Dao[Address] {
 
   override val logger = LoggerFactory.getLogger(classOf[AddressService])
-  override val tableInfo: TableInfo[Address] = TableInfo.build[Address]()
+  override val tableInfo: TableInfo[Address] = TableInfo.build()
   override implicit val reader: Read[Address] = Read.derived
   override implicit val writer: Write[Address] = Write.derived
 

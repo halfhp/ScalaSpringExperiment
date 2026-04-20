@@ -27,7 +27,6 @@ dependencies {
         exclude group: 'com.fasterxml.jackson.module'
     }
     implementation 'org.springframework.boot:spring-boot-starter-security'
-    implementation 'org.springframework.security:spring-security-test'
     implementation 'org.springframework.boot:spring-boot-starter-jdbc'
 
     implementation 'com.github.jwt-scala:jwt-circe_3:10.0.4'
